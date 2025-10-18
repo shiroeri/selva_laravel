@@ -1,0 +1,211 @@
+/* ----------------------------------- */
+/* 全体基本設定 */
+/* ----------------------------------- */
+body {
+    background-color: #FEF2CB; /* 背景色 #FEF2CB */
+}
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.error { 
+    color: red; 
+    font-size: 0.9em;
+    margin-top: 5px;
+    width: 100%; /* 行全体を使う */
+    padding-left: 170px; /* ラベルの幅（150px）＋パディング分右に寄せる */
+    box-sizing: border-box;
+    order: 10; /* Flexアイテムの最後に表示させる */
+}
+
+/* フォーム全体を中央に配置するコンテナ (input.blade.php / confirm.blade.php 共通) */
+.confirm-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+/* ----------------------------------- */
+/* フォームフィールドの共通設定 */
+/* ----------------------------------- */
+/* 各行（ニックネーム、パスワードなど）のコンテナ */
+.form-row {
+    display: flex;
+    align-items: flex-start; /* 要素の上端を揃える */
+    margin-bottom: 15px;
+    padding: 5px 0;
+    flex-wrap: wrap;
+}
+
+/* フォーム行のラベル（氏名グループ内の小さいラベルや性別ラベル以外） */
+.form-row > label:first-child:not(.name-label) {
+    flex-basis: 150px; /* ラベルの幅を固定 */
+    padding-top: 10px; /* inputの縦幅中央に合わせる */
+    text-align: left;
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+/* 入力欄（input[type="text"], input[type="email"], input[type="password"]）のスタイル */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    flex-grow: 1; /* 残りのスペースを埋める */
+    width: 60%;
+    padding: 10px 10px; /* 縦幅拡大 */
+    box-sizing: border-box; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* input.blade.phpの個別エラーメッセージはフォーム行のすぐ下に出るように調整 */
+.form-row > .error {
+    flex-basis: auto; /* ラベル幅の影響を受けない */
+}
+
+
+/* ----------------------------------- */
+/* 氏名（姓/名）の横並び配置 (name-group) */
+/* ----------------------------------- */
+
+.name-label {
+    /* 氏名全体のラベル */
+    flex-basis: 150px; 
+    padding-top: 10px;
+    text-align: left;
+    padding-left: 0;
+    padding-right: 20px;
+}
+.name-fields {
+    /* 姓と名の入力フィールドコンテナ */
+    display: flex;
+    gap: 10px; /* 姓と名の間隔 */
+    flex-grow: 1;
+}
+.name-item {
+    /* 姓または名のフィールド */
+    display: flex;
+    flex-direction: column; /* ラベルと入力欄を縦に並べる */
+    flex: 1; /* 均等な幅 */
+}
+.name-item label {
+    /* 姓と名、それぞれの小さいラベル */
+    font-size: 0.9em;
+    margin-bottom: 3px;
+    padding-left: 5px;
+    color: #666; /* ラベルの色を薄く */
+}
+
+.name-errors {
+    /* 氏名グループ全体のエラーメッセージ */
+    width: 100%;
+    padding-left: 170px;
+    box-sizing: border-box;
+    margin-top: -10px; /* name-fieldsとの距離を詰めるため */
+    order: 10;
+}
+
+.name-errors .error {
+    padding-left: 0; /* name-errors内では、さらにパディングを足さない */
+}
+
+.name-group .name-item {
+    /* flex-direction: column; は維持 */
+    flex: 1;
+}
+
+/* 氏名グループ内のエラーのパディングをリセット */
+.name-group .name-item .error {
+    /* 氏名のエラーは name-item の Flexbox の中で表示されるため、
+       左側のパディングは不要（親要素のname-itemがすでに調整済み） */
+    padding-left: 0; 
+    margin-top: 5px;
+    width: 100%;
+}
+
+
+/* ----------------------------------- */
+/* 性別ラジオボタンの配置 */
+/* ----------------------------------- */
+.gender-options {
+    /* 性別ラベルの右側全体 */
+    padding-top: 10px; 
+}
+.radio-label {
+    margin-right: 20px;
+}
+
+/* ----------------------------------- */
+/* 共通ボタン設定 */
+/* ----------------------------------- */
+.base-button {
+    border-radius: 8px; /* 角丸 */
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px 20px;
+    transition: opacity 0.2s;
+}
+.base-button:hover {
+    opacity: 0.9;
+}
+.primary-button {
+    background-color: #ED7D31;
+    color: white;
+    border: none;
+}
+.secondary-button {
+    background-color: white;
+    color: #ED7D31;
+    border: 2px solid #ED7D31;
+    padding: 8px 18px; /* 枠線分paddingを調整 */
+}
+
+/* ----------------------------------- */
+/* input.blade.php ボタン配置 */
+/* ----------------------------------- */
+.submit-center-button {
+    display: block;
+    margin: 30px auto 10px auto; /* 中央寄せ */
+    width: 200px;
+    text-align: center;
+}
+
+
+/* ----------------------------------- */
+/* confirm.blade.php スタイル */
+/* ----------------------------------- */
+.confirm-container.is-confirm {
+    text-align: center;
+}
+.confirm-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 80%;
+    max-width: 600px;
+}
+.confirm-table th, .confirm-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+.confirm-table th {
+    background-color: #f0f0f0;
+    width: 30%;
+}
+
+/* confirm.blade のボタン配置 (中央に縦並び) */
+.confirm-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+.confirm-actions .base-button {
+    display: block;
+    margin: 10px auto;
+    width: 200;
+}
+
+/* ----------------------------------- */
+/* confirm.blade.php スタイル */
+/* ----------------------------------- */
+.confirm-container p {
+    text-align: center;
+}
