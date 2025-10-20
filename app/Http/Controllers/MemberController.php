@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\MemberStoreRequest;
 use App\Models\Member;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class MemberController extends Controller
     }
 
     // 4. 完了画面表示
-    public function complete()
+    public function complete(Request $request)
     {
         // 完了フラグがない場合は不正アクセスとみなし、入力画面に戻す★
         if (!$request->session()->pull('registration_complete')) {

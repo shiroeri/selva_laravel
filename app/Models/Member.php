@@ -1,15 +1,18 @@
 <?php
 
-// app/Models/Member.php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // 論理削除を使う場合
+// 認証機能を持たせるために Authenticatable を use します
+use Illuminate\Foundation\Auth\User as Authenticatable; 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Eloquentモデルに通常必要なトレイト
 
-class Member extends Model
+// ★Model ではなく Authenticatable を継承します★
+class Member extends Authenticatable
 {
-    use SoftDeletes; // deleted_at を使うため追加
+    // 論理削除 (SoftDeletes) を維持します
+    use SoftDeletes;
+    use HasFactory; // 必要に応じて HasFactory を追加
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +28,17 @@ class Member extends Model
         'password',
         'email',
         'auth_code',
-        // 'created_at', 'updated_at' は timestamps() で自動処理されるため不要
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     * 認証情報として外部に出力される際に隠蔽する属性（パスワードなど）
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token', // 認証のために必要な場合があるため追加
     ];
 
     /**
