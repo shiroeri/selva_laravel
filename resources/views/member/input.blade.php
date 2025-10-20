@@ -99,6 +99,11 @@
         </div>
 
         <button type="submit" class="base-button primary-button submit-center-button">確認画面へ</button>
+
+        {{-- トップに戻るリンク --}}
+        <a href="{{ route('top') }}">
+            <button type="button" class="base-button secondary-button submit-center-button">トップに戻る</button>
+        </a>
     </form>
     </div>
 </body>
