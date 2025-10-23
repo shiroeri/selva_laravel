@@ -6,6 +6,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TopController;
 use App\Http\Controllers\PasswordReminderController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -58,4 +59,31 @@ Route::controller(PasswordReminderController::class)->group(function () {
 
     // ★追加ルート2: パスワード更新処理★
     Route::post('/password/update', 'updatePassword')->name('password.update');
+});
+
+// 認証が必要なルートグループ
+Route::middleware('auth')->group(function () {
+    
+    // 【追加】Ajaxによる小カテゴリ取得ルート
+    Route::get('/api/subcategories', [ProductController::class, 'getSubcategories'])->name('api.subcategories');
+
+    // ★新規: Ajaxによる画像アップロード一時保存ルートを追加 ★
+    Route::post('/api/product/upload-image', [ProductController::class, 'uploadImage'])->name('api.product.upload_image');
+
+    // ★★★ 商品登録フローのルート設定 ★★★
+    Route::controller(ProductController::class)->group(function () {
+        // ⑨ 商品登録フォームの表示
+        Route::match(['GET', 'POST'], '/product/create', [ProductController::class, 'create'])->name('product.create');
+
+        // ★追加1: 入力値確認処理 (バリデーションとセッション保存)
+        Route::post('/product/confirm', 'confirm')->name('product.confirm');
+        
+        // ★★★ 修正: 確認画面表示のGETルートを追加 ★★★
+        Route::get('/product/confirm', 'showConfirm')->name('product.show_confirm');
+
+        // ★追加2: DB登録実行処理 (確認画面からの遷移)
+        Route::post('/product/store', 'executeStore')->name('product.store');
+        
+        // 元の store ルートは executeStore に名前を変更し、product.store ルートに設定しました。
+    });
 });
