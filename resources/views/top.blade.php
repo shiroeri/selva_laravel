@@ -47,12 +47,13 @@
                 <span class="welcome-message">
                     ようこそ {{ Auth::user()->name_sei }} {{ Auth::user()->name_mei }}様
                 </span>
-                
+                <a href="{{ route('product.create') }}">新規商品登録</a>
                 {{-- 設計書要件: 「ログアウト」ボタンを表示 --}}
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                     @csrf
                     <button type="submit" class="header-button base-button">ログアウト</button>
                 </form>
+                
             @endauth
 
             {{-- =================================== --}}

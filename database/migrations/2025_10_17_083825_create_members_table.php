@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             // 会員ID (id)
-            $table->id('id')->comment('会員ID');
+            $table->increments('id')->comment('会員ID');
 
             // 氏名（姓） (name_sei)
             $table->string('name_sei', 255)->comment('氏名（姓）');
@@ -37,9 +37,13 @@ return new class extends Migration
             // 認証コード (auth_code)
             $table->integer('auth_code')->nullable()->comment('認証コード');
 
-            // タイムスタンプ (created_at, updated_at, deleted_at)
-            $table->timestamps(); // created_at と updated_at を NULL許容で自動作成
-            $table->softDeletes(); // deleted_at (論理削除用) を NULL許容で自動作成
+            $table->timestamp('created_at')->nullable()->comment('登録日時');
+            
+            // updated_at (編集日時)
+            $table->timestamp('updated_at')->nullable()->comment('編集日時');
+            
+            // deleted_at (削除日時)
+            $table->timestamp('deleted_at')->nullable()->comment('削除日時'); 
         });
     }
 
