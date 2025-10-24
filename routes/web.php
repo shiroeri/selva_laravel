@@ -1,12 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HelloController;
 use App\Http\Controllers\MemberController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\TopController;
 use App\Http\Controllers\PasswordReminderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TopController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,7 +74,8 @@ Route::middleware('auth')->group(function () {
     // ★★★ 商品登録フローのルート設定 ★★★
     Route::controller(ProductController::class)->group(function () {
         // ⑨ 商品登録フォームの表示
-        Route::match(['GET', 'POST'], '/product/create', [ProductController::class, 'create'])->name('product.create');
+        // Route::controller() を使用しているため、メソッド名のみを指定します
+        Route::match(['GET', 'POST'], '/product/create', 'create')->name('product.create');
 
         // ★追加1: 入力値確認処理 (バリデーションとセッション保存)
         Route::post('/product/confirm', 'confirm')->name('product.confirm');
@@ -82,8 +84,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/product/confirm', 'showConfirm')->name('product.show_confirm');
 
         // ★追加2: DB登録実行処理 (確認画面からの遷移)
-        Route::post('/product/store', 'executeStore')->name('product.store');
-        
-        // 元の store ルートは executeStore に名前を変更し、product.store ルートに設定しました。
+        // ルート名を product/confirm.blade.php と合わせて execute_store に修正
+        Route::post('/product/store', 'executeStore')->name('product.execute_store');
+
     });
 });
+
+// 商品一覧 (product.list) を認証グループの外に出す
+// 既存の /products ルート
+Route::get('/products', [ProductController::class, 'list'])->name('product.list');
+
+// ★【追加】/product/list ルートを追加し、既存と同じ処理に紐付ける
+// product.list.legacy の定義を追加することで、Controllerでの route() 呼び出しエラーを解消する
+Route::get('/product/list', [ProductController::class, 'list'])->name('product.list.legacy');

@@ -164,9 +164,9 @@
     {{-- ------------------------------------------------ --}}
     <div class="button-group">
         
-        {{-- 登録実行ボタン: セッションのデータを使ってDBに保存 (product.store) --}}
+        {{-- 登録実行ボタン: セッションのデータを使ってDBに保存 (product.execute_store) --}}
         {{-- ★修正: IDを追加しました。 --}}
-        <form action="{{ route('product.store') }}" method="POST" id="product-store-form">
+        <form action="{{ route('product.execute_store') }}" method="POST" id="product-store-form">
             @csrf
             {{-- このフォームにはセッションID以外のデータは含めません --}}
             <button type="submit" class="btn btn-primary" id="submit-button">商品を登録する</button>

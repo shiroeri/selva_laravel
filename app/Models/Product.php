@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+// 必要なリレーション先モデルをインポート
+use App\Models\ProductSubcategory; 
+use App\Models\ProductCategory; // ★追加：ProductCategoryモデルをインポート★
 
 class Product extends Model
 {
@@ -41,5 +44,24 @@ class Product extends Model
     public function member()
     {
         return $this->belongsTo(Member::class, 'member_id');
+    }
+    
+    /**
+     * リレーションシップ: この商品が属するサブカテゴリ
+     */
+    public function subcategory()
+    {
+        // 外部キー 'product_subcategory_id' を使用して ProductSubcategory モデルと関連付けます。
+        return $this->belongsTo(ProductSubcategory::class, 'product_subcategory_id');
+    }
+
+    /**
+     * リレーションシップ: この商品が属するカテゴリ (大)
+     * ★追加されたメソッド★
+     */
+    public function category()
+    {
+        // 外部キー 'product_category_id' を使用して ProductCategory モデルと関連付けます。
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 }
