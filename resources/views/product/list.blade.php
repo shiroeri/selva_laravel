@@ -23,12 +23,17 @@
         .btn-clear:hover { background-color: #4b5563; }
         .btn-register { background-color: #10b981; color: white; }
         .btn-register:hover { background-color: #059669; }
+        .btn-detail { background-color: #f97316; color: white; font-size: 0.85em; padding: 6px 12px; }
+        .btn-detail:hover { background-color: #ea580c; }
         .product-image { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
         
         /* テーブルスタイル */
         .product-table th, .product-table td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; text-align: left; }
         .product-table th { background-color: #f3f4f6; color: #4b5563; font-weight: 600; font-size: 0.9em; }
-        .product-table tr:hover { background-color: #f9fafb; }
+        /* カーソルを合わせても詳細ボタンがある列以外はホバー背景色を変えないように調整 */
+        .product-table tr:not(.no-result-row):hover { background-color: #f9fafb; }
+        .product-table tr a:hover { text-decoration: underline; color: #1d4ed8; } /* 商品名リンクのホバー効果 */
+
         .no-result { text-align: center; color: #9ca3af; padding: 40px 0; font-size: 1.1em; }
         
         /* フラッシュメッセージ */
@@ -116,7 +121,7 @@
                     <th class="w-20">写真</th>
                     <th class="w-1/4">カテゴリ</th>
                     <th class="w-1/4">商品名</th>
-                    <!-- <th class="w-1/4">登録日</th> -->
+                    <th class="w-32"></th> {{-- 詳細ボタン用の列を追加 --}}
                 </tr>
             </thead>
             <tbody>
@@ -128,6 +133,7 @@
                                 $imagePath = $product->image_1;
                                 $imageUrl = $imagePath ? asset('storage/' . $imagePath) : 'https://placehold.co/80x80/cccccc/333333?text=No+Photo';
                             @endphp
+                            {{-- 画像も詳細ページへのリンクに含めても良いですが、今回は商品名のみをリンクとします --}}
                             <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="product-image" 
                                  onerror="this.onerror=null; this.src='https://placehold.co/80x80/cccccc/333333?text=Error'">
                         </td>
@@ -136,13 +142,21 @@
                             {{ $product->category->name ?? '不明' }} 
                             <span class="text-gray-500 text-sm"> > {{ $product->subcategory->name ?? '不明' }}</span>
                         </td>
-                        <td class="text-gray-900 font-medium">{{ $product->name }}</td>
-                        <!-- <td class="text-gray-500 text-sm">
-                            {{ $product->created_at->format('Y/m/d H:i') }}
-                        </td> -->
+                        <td class="text-gray-900 font-medium">
+                            {{-- ★修正: 商品名をクリックで詳細画面へ遷移★ --}}
+                            <a href="{{ route('product.detail', ['id' => $product->id, 'page' => $products->currentPage()]) }}" class="text-blue-600 hover:text-blue-800">
+                                {{ $product->name }}
+                            </a>
+                        </td>
+                        <td>
+                            {{-- ★新規追加: 詳細ボタン★ --}}
+                            <a href="{{ route('product.detail', ['id' => $product->id, 'page' => $products->currentPage()]) }}" class="btn btn-detail">
+                                詳細
+                            </a>
+                        </td>
                     </tr>
                 @empty
-                    <tr>
+                    <tr class="no-result-row">
                         <td colspan="4" class="no-result">該当する商品が見つかりませんでした。</td>
                     </tr>
                 @endforelse
@@ -152,8 +166,8 @@
 
     {{-- 3. ページネーションリンク --}}
     <div class="mt-8">
-        {{-- ★修正箇所: カスタムビューの指定を削除し、links() のみを使用します。★ --}}
-        {{ $products->links() }}
+        {{-- ページネーションリンクを生成し、検索条件を維持します --}}
+        {{ $products->appends(request()->input())->links() }}
     </div>
 
     {{-- トップに戻るリンク --}}
@@ -183,9 +197,8 @@
             }
             
             // APIルートのURLを構築 (このルートが存在するものとしています)
-            // 例: {{ route('api.subcategories') }}
-            // 環境に依存するため、ここではハードコードを避けています
-            const url = `/api/subcategories?category_id=${categoryId}`; // 仮のパス
+            // route('api.subcategories') は /api/subcategories に解決されます
+            const url = `/api/subcategories?category_id=${categoryId}`;
 
             fetch(url)
                 .then(response => {
@@ -220,7 +233,6 @@
         // 大カテゴリの変更時イベント
         categorySelect.addEventListener('change', function () {
             // 大カテゴリが変更されたら小カテゴリの選択状態をリセット
-            // data-old-valueの値は変更しない（初期ロード時の復元用であるため）
             subcategorySelect.value = ''; 
             updateSubcategories(this.value, false);
         });
