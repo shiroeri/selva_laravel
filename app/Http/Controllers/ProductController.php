@@ -12,7 +12,7 @@ use App\Models\ProductSubcategory;
 use App\Models\Product;                     
 use Illuminate\Support\Facades\Config;      // assetヘルパーの動作確認のため
 use Illuminate\Support\Facades\Validator;   // バリデーション手動実行のため
-use Illuminate\Validation\Rule;           // 【追加】カスタムRuleの使用のため
+use Illuminate\Validation\Rule;           // カスタムRuleの使用のため
 
 class ProductController extends Controller
 {
@@ -87,7 +87,7 @@ class ProductController extends Controller
     }
     
     /**
-     * 【変更】Ajaxで大カテゴリIDに基づいた小カテゴリリストを返す (変更なし)
+     * Ajaxで大カテゴリIDに基づいた小カテゴリリストを返す
      * * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -108,7 +108,7 @@ class ProductController extends Controller
     }
     
     /**
-     * 【新規 Ajax】画像ファイルを一時保存する (変更なし)
+     * Ajaxで画像ファイルを一時保存する
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -138,7 +138,7 @@ class ProductController extends Controller
             
             return response()->json([
                 'success' => false, 
-                // 【修正点】エラーメッセージをフロントエンドに渡す
+                // エラーメッセージをフロントエンドに渡す
                 'message' => $errorMessage, 
             ], 422); // HTTP 422 Unprocessable Entity
         }
@@ -158,7 +158,7 @@ class ProductController extends Controller
             // putFileAs は成功した場合にパスを返す
             $path = Storage::disk('public')->putFileAs('tmp', $uploadedFile, $fileName, 'public');
             
-            // ★★★ 権限強制変更の処理とデバッグ情報取得 (ここから) ★★★
+            // 権限強制変更の処理とデバッグ情報取得 (ここから)
             $fullPath = Storage::disk('public')->path($path);
             $chmodResult = null;
             
@@ -166,9 +166,9 @@ class ProductController extends Controller
             if (file_exists($fullPath)) {
                 $chmodResult = @chmod($fullPath, 0777); 
             }
-            // ★★★ 権限強制変更の処理とデバッグ情報取得 (ここまで) ★★★
+            // 権限強制変更の処理とデバッグ情報取得 (ここまで)
 
-            // ★★★ デバッグ用ログ ★★★
+            // デバッグ用ログ
             // ホスト名とプロトコルの問題を回避するため、asset()で絶対URLを生成
             $storagePath = 'storage/' . $path; // storage/tmp/filename.ext の形
             $publicUrl = asset($storagePath); 
@@ -176,7 +176,7 @@ class ProductController extends Controller
             Log::info("--- 画像アップロード成功 ---");
             Log::info("一時保存パス: " . $path);
             Log::info("生成されたURL: " . $publicUrl);
-            // ★★★ ここまで ★★★
+            // ここまで
 
             // 5. 成功レスポンスを返す
             return response()->json([
@@ -212,7 +212,7 @@ class ProductController extends Controller
     }
     
     /**
-     * 【修正】商品登録の確認処理 (入力値と一時ファイル情報のセッション保存)
+     * 商品登録の確認処理 (入力値と一時ファイル情報のセッション保存)
      * バリデーション失敗時に一時画像データをビューに渡し、プレビューを復元できるように修正済み。
      */
     public function confirm(Request $request)
@@ -225,7 +225,7 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:100'], 
             'product_category_id' => ['required', 'integer', 'exists:product_categories,id'], 
             
-            // 【修正箇所】小カテゴリのバリデーションルールを変更
+            // 小カテゴリのバリデーションルールを変更
             'product_subcategory_id' => [
                 'required', 
                 'integer', 
@@ -253,7 +253,7 @@ class ProductController extends Controller
             'product_category_id.required' => ':attribute を選択してください。',
             'product_category_id.exists' => ':attribute の値が不正です。存在するカテゴリを選択してください。',
             'product_subcategory_id.required' => ':attribute を選択してください。',
-            // 【修正箇所】カスタムRuleによるエラーメッセージ。このメッセージが表示されます。
+            // カスタムRuleによるエラーメッセージ。このメッセージが表示されます。
             'product_subcategory_id.exists' => ':attribute の値が不正です。選択された大カテゴリに紐づくサブカテゴリを選択してください。',
             'name.required' => ':attribute は必須項目です。',
             'product_content.required' => ':attribute は必須項目です。',
@@ -301,7 +301,7 @@ class ProductController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->withErrors($validator)
-                // ★ バリデーションエラー時、このフラッシュデータでプレビューを復元する
+                // バリデーションエラー時、このフラッシュデータでプレビューを復元する
                 ->with('initialImageData', $tempImagePaths); 
         }
 
@@ -348,7 +348,7 @@ class ProductController extends Controller
     }
     
     /**
-     * 【新規】商品登録の確認画面表示 (Ajax一時ファイル情報を使用) (変更なし)
+     * 商品登録の確認画面表示 (Ajax一時ファイル情報を使用)
      */
     public function showConfirm(Request $request)
     {
@@ -364,7 +364,7 @@ class ProductController extends Controller
         $category = ProductCategory::find($input['product_category_id']);
         $subcategory = ProductSubcategory::find($input['product_subcategory_id']);
         
-        // ★一時ファイル情報（URL含む）をビューに渡す
+        // 一時ファイル情報（URL含む）をビューに渡す
         $imageData = $session->get('product_images');
 
         return view('product.confirm', [
@@ -376,7 +376,7 @@ class ProductController extends Controller
     }
 
     /**
-     * 【修正】商品登録処理を実行する (確認画面から実行される) (変更なし)
+     * 商品登録処理を実行する (確認画面から実行される)
      */
     public function executeStore(Request $request)
     {
@@ -439,11 +439,11 @@ class ProductController extends Controller
                 'product_content' => $input['product_content'],
             ], $finalImagePaths));
             
-            // 4. セッションクリア (変更なし)
+            // 4. セッションクリア
             $session->forget('product_input');
             $session->forget('product_images');
 
-            // 5. 完了後のリダイレクト (変更なし)
+            // 5. 完了後のリダイレクト
             return redirect()->route('product.list')->with('status', '商品が正常に登録されました。'); 
 
         } catch (\Exception $e) {
@@ -518,5 +518,31 @@ class ProductController extends Controller
             'search' => $search,                 // 現在の検索条件
             'selectedCategoryId' => $selectedCategoryId, // 小カテゴリ初期表示用
         ]);
+    }
+    
+    // ★★★ 商品詳細機能の追加（show メソッドを showDetail にリネーム） ★★★
+    
+    /**
+     * 商品詳細画面を表示
+     *
+     * @param  int  $id 商品ID
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function showDetail($id, Request $request) // ★ show から showDetail にリネーム ★
+    {
+        // Eloquentを利用して商品を取得。カテゴリとサブカテゴリも同時にロード（N+1問題対策）
+        $product = Product::with(['category', 'subcategory'])->findOrFail($id);
+
+        // 「一覧に戻る」ボタン用に、一覧画面からのページ番号をセッションに保存
+        // 遷移元のURLから'page'クエリパラメータを取得。なければ1ページ目とする。
+        $sourcePage = $request->query('page', 1);
+        
+        // Log::info('商品詳細表示: 遷移元ページ番号=' . $sourcePage); // デバッグ用
+
+        // 次の画面（show.blade.phpの戻るボタン）で利用できるようセッションに保存
+        $request->session()->put('product_list_source_page', $sourcePage);
+
+        return view('product.show', compact('product'));
     }
 }

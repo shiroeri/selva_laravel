@@ -97,3 +97,6 @@ Route::get('/products', [ProductController::class, 'list'])->name('product.list'
 // ★【追加】/product/list ルートを追加し、既存と同じ処理に紐付ける
 // product.list.legacy の定義を追加することで、Controllerでの route() 呼び出しエラーを解消する
 Route::get('/product/list', [ProductController::class, 'list'])->name('product.list.legacy');
+
+// ★【新規追加】商品詳細画面のルート (IDを含む)
+Route::get('/product/{id}', [ProductController::class, 'showDetail'])->name('product.detail');
