@@ -237,7 +237,14 @@
         <div style="margin-top: 30px; margin-bottom: 50px; padding: 0 10px;">
             {{-- 確認画面へ遷移するボタン --}}
             <button type="submit" class="btn btn-primary" id="submit-button">確認画面へ</button>
-            <a href="{{ route('top') }}" class="btn btn-secondary">トップに戻る</a>
+
+            @if (isset($source) && $source === 'list')
+                <!-- 商品一覧 (product.list) から遷移してきた場合に表示 -->
+                <a href="{{ route('product.list') }}" class="btn btn-secondary">商品一覧に戻る</a>
+            @else
+                <!-- トップ (top) またはその他の画面から遷移してきた場合に表示 -->
+                <a href="{{ route('top') }}" class="btn btn-secondary">トップに戻る</a>
+            @endif
         </div>
     </form>
 </div>

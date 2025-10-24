@@ -67,10 +67,23 @@ class ProductController extends Controller
             $initialImageData = $session->get('product_images', []);
         }
 
+        // 遷移元 (リファラー) を判定
+        $referer = url()->previous();
+    
+        // 商品一覧画面からの遷移か判定（URLに /products または /product/list が含まれるか）
+        if (Str::contains($referer, route('product.list', [], false)) || Str::contains($referer, route('product.list.legacy', [], false))) {
+            $source = 'list'; // 商品一覧からの遷移
+        } else {
+            $source = 'top';  // それ以外（トップなど）からの遷移
+        }
+
         return view('product.create', [
             'categories' => $categories,
             'initialImageData' => $initialImageData, // ビューに一時ファイル情報（パスとURL）を渡す
+            'source' => $source,
         ]);
+
+        
     }
     
     /**
@@ -431,7 +444,7 @@ class ProductController extends Controller
             $session->forget('product_images');
 
             // 5. 完了後のリダイレクト (変更なし)
-            return redirect()->route('top')->with('status', '商品が正常に登録されました。'); 
+            return redirect()->route('product.list')->with('status', '商品が正常に登録されました。'); 
 
         } catch (\Exception $e) {
             Log::error('商品登録エラー: ' . $e->getMessage());
@@ -441,5 +454,69 @@ class ProductController extends Controller
             
             return redirect()->route('product.create')->withErrors(['error' => '商品登録中にエラーが発生しました。再度入力してください。']);
         }
+    }
+    
+    // ★★★ 商品一覧・検索機能の実装 ★★★
+
+    /**
+     * 商品一覧と検索結果の表示
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function list(Request $request)
+    {
+        // 1. 検索条件の取得 (クエリパラメータ)
+        $search = $request->only([
+            'product_category_id', 
+            'product_subcategory_id', 
+            'free_word'
+        ]);
+        
+        // 2. 全カテゴリデータの取得 (検索フォーム用)
+        $categories = ProductCategory::all();
+        // 検索時に小カテゴリを初期表示させるために、選択されている大カテゴリIDを取得
+        $selectedCategoryId = $search['product_category_id'] ?? null;
+        
+        // 3. 検索クエリの構築
+        // Productモデルは、カテゴリとサブカテゴリにリレーションが定義されている前提です
+        $query = Product::with(['category', 'subcategory']);
+
+        // カテゴリ検索
+        if (!empty($search['product_category_id'])) {
+            $query->where('product_category_id', $search['product_category_id']);
+        }
+
+        // 小カテゴリ検索 (大カテゴリが選択されている前提)
+        if (!empty($search['product_subcategory_id'])) {
+            $query->where('product_subcategory_id', $search['product_subcategory_id']);
+        }
+        
+        // フリーワード検索 (商品名または商品説明)
+        if (!empty($search['free_word'])) {
+            // 【重要】OR検索を行うため、クロージャでwhere条件をグループ化
+            $query->where(function ($q) use ($search) {
+                // LIKE検索用のキーワードをエスケープ
+                $keyword = preg_replace('/([%_])/', '\\\$1', $search['free_word']);
+                
+                // 商品名での部分一致検索
+                $q->where('name', 'LIKE', '%' . $keyword . '%')
+                  // または商品説明での部分一致検索
+                  ->orWhere('product_content', 'LIKE', '%' . $keyword . '%');
+            });
+        }
+        
+        // 4. 登録順の逆順 (新しいもの順) でソート
+        $query->orderBy('created_at', 'desc');
+
+        // 5. 10件ずつのページネーションを実行
+        // appends($search) で検索条件をページネーションリンクに引き継ぐ
+        $products = $query->paginate(10)->appends($search);
+
+        return view('product.list', [
+            'products' => $products,             // 検索結果 (ページネーション済み)
+            'categories' => $categories,         // 検索フォーム用カテゴリリスト
+            'search' => $search,                 // 現在の検索条件
+            'selectedCategoryId' => $selectedCategoryId, // 小カテゴリ初期表示用
+        ]);
     }
 }

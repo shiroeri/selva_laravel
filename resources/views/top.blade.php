@@ -47,6 +47,7 @@
                 <span class="welcome-message">
                     ようこそ {{ Auth::user()->name_sei }} {{ Auth::user()->name_mei }}様
                 </span>
+                <a href="{{ route('product.list') }}">商品一覧</a>
                 <a href="{{ route('product.create') }}">新規商品登録</a>
                 {{-- 設計書要件: 「ログアウト」ボタンを表示 --}}
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
@@ -61,6 +62,8 @@
             {{-- =================================== --}}
             @guest
                 {{-- 設計書要件: 「ようこそ〇〇様」は非表示 --}}
+
+                <a href="{{ route('product.list') }}">商品一覧</a>
 
                 {{-- 設計書要件: 「新規会員登録」ボタンを表示 --}}
                 <a href="{{ route('member.input') }}" class="header-button base-button primary-button">新規会員登録</a>
