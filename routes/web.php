@@ -7,8 +7,8 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PasswordReminderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TopController;
-use App\Http\Controllers\ReviewController; // ReviewController を使用するためにインポート
-
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\MyPageController; // ★追加：マイページコントローラをインポート
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,7 +37,7 @@ Route::controller(MemberController::class)->group(function () {
     // ログイン処理（フォーム送信先）
     Route::post('/login', [LoginController::class, 'login'])->name('login.post'); 
 
-    // ログアウト処理
+    // ログアウト処理 (既存のものをそのまま利用)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
@@ -109,6 +109,11 @@ Route::middleware('auth')->group(function () {
 
     // ★★★ ここまでレビュー投稿ルート ★★★
 
+    // ★★★ マイページ機能のルート設定（ここを追加しました） ★★★
+    // 仕様: マイページはログイン時のみ遷移可能
+    Route::get('/mypage', [MyPageController::class, 'index'])->name('mypage.index');
+    // ★★★ マイページ機能のルート設定（ここまで） ★★★
+
 });
 
 // 商品一覧 (product.list) を認証グループの外に出す
@@ -123,8 +128,6 @@ Route::get('/product/list', [ProductController::class, 'list'])->name('product.l
 Route::get('/product/{product}', [ProductController::class, 'showDetail'])->name('product.show');
 
 Route::get('/products/{product}/reviews/cancel', [ReviewController::class, 'cancelAndRedirect'])->name('product.review.cancel_to_top');
-
-// 元々あった 'product.detail' や 'products.show' の重複定義は削除しました。
 
 // 商品IDを指定して、その商品のレビュー一覧を表示するルート
 // 例: /products/1/reviews
