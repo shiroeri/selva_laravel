@@ -49,6 +49,8 @@
                 </span>
                 <a href="{{ route('product.list') }}">商品一覧</a>
                 <a href="{{ route('product.create') }}">新規商品登録</a>
+                {{-- 仕様: クリックでマイページへ遷移（ログイン時のみ表示・遷移可能） --}}
+                <a href="{{ route('mypage.index') }}" class="nav-item nav-item-mypage">マイページ</a>
                 {{-- 設計書要件: 「ログアウト」ボタンを表示 --}}
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                     @csrf
