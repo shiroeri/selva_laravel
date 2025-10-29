@@ -121,11 +121,19 @@
                     <th class="w-20">写真</th>
                     <th class="w-1/4">カテゴリ</th>
                     <th class="w-1/4">商品名</th>
+                    <th class="w-1/4">商品総合評価</th>
                     <th class="w-32"></th> {{-- 詳細ボタン用の列を追加 --}}
                 </tr>
             </thead>
             <tbody>
                 @forelse ($products as $product)
+                    {{-- ★修正: 評価値を取得する変数名を $product->reviews_avg_evaluation に変更し、nullチェックを追加 --}}
+                    @php
+                        $rating = $product->reviews_avg_evaluation;
+                        // 評価がnull (レビューなし) の場合は 0 とする
+                        $displayRating = is_numeric($rating) ? round($rating, 1) : 0;
+                    @endphp
+
                     <tr>
                         <td>
                             @php
@@ -144,20 +152,38 @@
                         </td>
                         <td class="text-gray-900 font-medium">
                             {{-- ★修正: 商品名をクリックで詳細画面へ遷移★ --}}
-                            <a href="{{ route('product.detail', ['id' => $product->id, 'page' => $products->currentPage()]) }}" class="text-blue-600 hover:text-blue-800">
-                                {{ $product->name }}
+                            <a href="{{ route('product.show', [$product, 'page' => $products->currentPage()]) }}" class="text-blue-600 hover:text-blue-800">
+                            {{ $product->name }}
                             </a>
                         </td>
                         <td>
+                            <div class="text-sm">
+                                {{-- 星の表示 (ここでは5段階評価の★を表示) --}}
+                                <div class="text-yellow-500 text-2xl" style="letter-spacing: 0.1em;">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        {{-- ★★修正: $averageEvaluation を $displayRating に変更しました★★ --}}
+                                        @if ($i <= ceil($displayRating))
+                                            ★
+                                        @else
+                                            <span class="text-gray-300">★</span>
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                            <span class="text-4xl font-extrabold mr-2 {{ $displayRating > 0 ? 'text-indigo-600' : 'text-gray-400' }}">
+                                {{ ceil($displayRating) }}
+                            </span>
+                        </td>
+                        <td>
                             {{-- ★新規追加: 詳細ボタン★ --}}
-                            <a href="{{ route('product.detail', ['id' => $product->id, 'page' => $products->currentPage()]) }}" class="btn btn-detail">
+                            <a href="{{ route('product.show', [$product, 'page' => $products->currentPage()]) }}" class="btn btn-detail">
                                 詳細
                             </a>
                         </td>
                     </tr>
                 @empty
                     <tr class="no-result-row">
-                        <td colspan="4" class="no-result">該当する商品が見つかりませんでした。</td>
+                        <td colspan="5" class="no-result">該当する商品が見つかりませんでした。</td>
                     </tr>
                 @endforelse
             </tbody>

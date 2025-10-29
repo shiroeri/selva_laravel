@@ -98,6 +98,16 @@
             background-color: #059669;
             transform: translateY(-1px);
         }
+        /* ★追加★ レビューボタンのスタイル */
+        .btn-review {
+            background-color: #ec4899; /* Pink */
+            color: white;
+            box-shadow: 0 4px 6px rgba(236, 72, 153, 0.3);
+        }
+        .btn-review:hover { 
+            background-color: #db2777;
+            transform: translateY(-1px);
+        }
 
         /* 画像ギャラリーのスタイル */
         .image-gallery {
@@ -212,6 +222,11 @@
             
         </section>
 
+        {{-- ★★★ 商品レビューセクションの読み込み ★★★ --}}
+        {{-- product/showDetailメソッドから渡される $product, $reviews, $averageEvaluation, $reviewCount, $hasReviewed を利用 --}}
+        @include('product.review_section')
+        {{-- ★★★ 読み込み終了 ★★★ --}}
+
         {{-- ボタン群 --}}
         <div class="btn-group">
             @php
@@ -227,7 +242,24 @@
                 商品一覧に戻る
             </a>
             
-            {{-- コンテナ下部の「トップに戻る」ボタンは、上部のボタンが目立つため、削除しました。 --}}
+            {{-- ★★★ ここからレビューボタンの追加 ★★★ --}}
+            @auth
+                {{-- ログイン済みの場合のみ表示 --}}
+                {{-- $hasReviewed は ReviewController@getReviewDataForProductShow から渡されます --}}
+                
+                    <a href="{{ route('product.review.create', $product) }}" class="btn btn-review">
+                        この商品についてのレビューを登録
+                    </a>
+                
+                    <!-- {{-- 既にレビュー投稿済みの場合、ボタンの代わりにメッセージを表示 --}}
+                    <div class="text-pink-600 font-semibold p-3 border border-pink-300 bg-pink-50 rounded-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        この商品には既にレビューを投稿済みです
+                    </div> -->
+                
+            @endauth
+            {{-- ★★★ レビューボタンの追加終了 ★★★ --}}
+
         </div>
     </div>
 </body>
