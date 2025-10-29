@@ -13,6 +13,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Config;      // assetヘルパーの動作確認のため
 use Illuminate\Support\Facades\Validator;   // バリデーション手動実行のため
 use Illuminate\Validation\Rule;           // カスタムRuleの使用のため
+use App\Http\Controllers\ReviewController;  // ReviewControllerを使用するため
 
 class ProductController extends Controller
 {
@@ -479,7 +480,7 @@ class ProductController extends Controller
         
         // 3. 検索クエリの構築
         // Productモデルは、カテゴリとサブカテゴリにリレーションが定義されている前提です
-        $query = Product::with(['category', 'subcategory']);
+        $query = Product::with(['category', 'subcategory'])->withAvg('reviews', 'evaluation');
 
         // カテゴリ検索
         if (!empty($search['product_category_id'])) {
@@ -529,7 +530,7 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-    public function showDetail($id, Request $request) // ★ show から showDetail にリネーム ★
+    public function showDetail($id, Request $request) 
     {
         // Eloquentを利用して商品を取得。カテゴリとサブカテゴリも同時にロード（N+1問題対策）
         $product = Product::with(['category', 'subcategory'])->findOrFail($id);
@@ -538,11 +539,23 @@ class ProductController extends Controller
         // 遷移元のURLから'page'クエリパラメータを取得。なければ1ページ目とする。
         $sourcePage = $request->query('page', 1);
         
-        // Log::info('商品詳細表示: 遷移元ページ番号=' . $sourcePage); // デバッグ用
-
         // 次の画面（show.blade.phpの戻るボタン）で利用できるようセッションに保存
         $request->session()->put('product_list_source_page', $sourcePage);
 
-        return view('product.show', compact('product'));
+        // ★★★ レビューデータを取得してビューに渡す処理を追加 ★★★
+        $reviewData = ReviewController::getReviewDataForProductShow($id);
+
+        return view('product.show', [ // ★修正: ビュー名を product.show に戻しました。★
+            'product' => $product,
+            
+            // ★レビューデータをビューに渡す★
+            'reviews' => $reviewData['reviews'],
+            'averageEvaluation' => $reviewData['averageEvaluation'],
+            'reviewCount' => $reviewData['reviewCount'],
+            'hasReviewed' => $reviewData['hasReviewed'],
+        ]);
+        // ★★★ 追加処理ここまで ★★★
     }
+
+    
 }

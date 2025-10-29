@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品一覧・検索</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* カスタムスタイル */
@@ -45,55 +45,57 @@
 <div class="container">
     <div class="flex justify-between items-center mb-6">
         <h1>商品一覧</h1>
-        @auth
-        <a href="{{ route('product.create') }}" class="btn btn-register">新規商品登録</a>
-        @endauth
+        <?php if(auth()->guard()->check()): ?>
+        <a href="<?php echo e(route('product.create')); ?>" class="btn btn-register">新規商品登録</a>
+        <?php endif; ?>
     </div>
 
-    {{-- 登録完了メッセージ --}}
-    @if (session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="flash-success" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
+            <?php echo e(session('success')); ?>
 
-    {{-- ------------------------------------------------ --}}
-    {{-- 1. 検索フォーム --}}
-    {{-- ------------------------------------------------ --}}
+        </div>
+    <?php endif; ?>
+
+    
+    
+    
     <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-8">
         <h2 class="text-xl font-semibold mb-4 text-gray-700">商品検索</h2>
-        <form action="{{ route('product.list') }}" method="GET" id="search-form">
+        <form action="<?php echo e(route('product.list')); ?>" method="GET" id="search-form">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                {{-- 大カテゴリ --}}
+                
                 <div class="form-group">
                     <label for="product_category_id">カテゴリ</label>
                     <select id="product_category_id" name="product_category_id" class="input-field">
                         <option value="">カテゴリ</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" 
-                                {{ ($search['product_category_id'] ?? '') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
+                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($category->id); ?>" 
+                                <?php echo e(($search['product_category_id'] ?? '') == $category->id ? 'selected' : ''); ?>>
+                                <?php echo e($category->name); ?>
+
                             </option>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
                 
-                {{-- 小カテゴリ (JavaScriptで動的に更新) --}}
+                
                 <div class="form-group">
                     <label for="product_subcategory_id">　　　　　</label>
-                    {{-- 検索条件を保持し、JSで初期ロード時に設定するため data-old-value を使用 --}}
+                    
                     <select id="product_subcategory_id" name="product_subcategory_id" class="input-field" disabled 
-                            data-old-value="{{ $search['product_subcategory_id'] ?? '' }}">
+                            data-old-value="<?php echo e($search['product_subcategory_id'] ?? ''); ?>">
                         <option value="">サブカテゴリ</option>
                     </select>
                 </div>
                 
-                {{-- フリーワード --}}
+                
                 <div class="form-group">
                     <label for="free_word">フリーワード</label>
                     <input type="text" id="free_word" name="free_word" class="input-field" 
-                           placeholder="キーワードを入力" value="{{ $search['free_word'] ?? '' }}">
+                           placeholder="キーワードを入力" value="<?php echo e($search['free_word'] ?? ''); ?>">
                 </div>
             </div>
             
@@ -101,7 +103,7 @@
                 <button type="submit" class="btn btn-search">
                     商品検索
                 </button>
-                <!-- <a href="{{ route('product.list') }}" class="btn btn-clear">
+                <!-- <a href="<?php echo e(route('product.list')); ?>" class="btn btn-clear">
                     クリア
                 </a> -->
             </div>
@@ -109,10 +111,10 @@
     </div>
 
 
-    {{-- ------------------------------------------------ --}}
-    {{-- 2. 商品一覧表示 --}}
-    {{-- ------------------------------------------------ --}}
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">検索結果 ({{ $products->total() }}件)</h2>
+    
+    
+    
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">検索結果 (<?php echo e($products->total()); ?>件)</h2>
 
     <div class="overflow-x-auto shadow-md rounded-lg">
         <table class="min-w-full product-table bg-white">
@@ -122,82 +124,85 @@
                     <th class="w-1/4">カテゴリ</th>
                     <th class="w-1/4">商品名</th>
                     <th class="w-1/4">商品総合評価</th>
-                    <th class="w-32"></th> {{-- 詳細ボタン用の列を追加 --}}
+                    <th class="w-32"></th> 
                 </tr>
             </thead>
             <tbody>
-                @forelse ($products as $product)
-                    {{-- ★修正: 評価値を取得する変数名を $product->reviews_avg_evaluation に変更し、nullチェックを追加 --}}
-                    @php
+                <?php $__empty_1 = true; $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    
+                    <?php
                         $rating = $product->reviews_avg_evaluation;
                         // 評価がnull (レビューなし) の場合は 0 とする
                         $displayRating = is_numeric($rating) ? round($rating, 1) : 0;
-                    @endphp
+                    ?>
 
                     <tr>
                         <td>
-                            @php
+                            <?php
                                 // DBに保存されている画像パス (image_1) を使用
                                 $imagePath = $product->image_1;
                                 $imageUrl = $imagePath ? asset('storage/' . $imagePath) : 'https://placehold.co/80x80/cccccc/333333?text=No+Photo';
-                            @endphp
-                            {{-- 画像も詳細ページへのリンクに含めても良いですが、今回は商品名のみをリンクとします --}}
-                            <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="product-image" 
+                            ?>
+                            
+                            <img src="<?php echo e($imageUrl); ?>" alt="<?php echo e($product->name); ?>" class="product-image" 
                                  onerror="this.onerror=null; this.src='https://placehold.co/80x80/cccccc/333333?text=Error'">
                         </td>
                         <td class="text-gray-700">
-                            {{-- category()リレーションとsubcategory()リレーションを使用 --}}
-                            {{ $product->category->name ?? '不明' }} 
-                            <span class="text-gray-500 text-sm"> > {{ $product->subcategory->name ?? '不明' }}</span>
+                            
+                            <?php echo e($product->category->name ?? '不明'); ?> 
+                            <span class="text-gray-500 text-sm"> > <?php echo e($product->subcategory->name ?? '不明'); ?></span>
                         </td>
                         <td class="text-gray-900 font-medium">
-                            {{-- ★修正: 商品名をクリックで詳細画面へ遷移★ --}}
-                            <a href="{{ route('product.show', [$product, 'page' => $products->currentPage()]) }}" class="text-blue-600 hover:text-blue-800">
-                            {{ $product->name }}
+                            
+                            <a href="<?php echo e(route('product.show', [$product, 'page' => $products->currentPage()])); ?>" class="text-blue-600 hover:text-blue-800">
+                            <?php echo e($product->name); ?>
+
                             </a>
                         </td>
                         <td>
                             <div class="text-sm">
-                                {{-- 星の表示 (ここでは5段階評価の★を表示) --}}
+                                
                                 <div class="text-yellow-500 text-2xl" style="letter-spacing: 0.1em;">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        {{-- ★★修正: $averageEvaluation を $displayRating に変更しました★★ --}}
-                                        @if ($i <= ceil($displayRating))
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        
+                                        <?php if($i <= ceil($displayRating)): ?>
                                             ★
-                                        @else
+                                        <?php else: ?>
                                             <span class="text-gray-300">★</span>
-                                        @endif
-                                    @endfor
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
                                 </div>
                             </div>
-                            <span class="text-4xl font-extrabold mr-2 {{ $displayRating > 0 ? 'text-indigo-600' : 'text-gray-400' }}">
-                                {{ ceil($displayRating) }}
+                            <span class="text-4xl font-extrabold mr-2 <?php echo e($displayRating > 0 ? 'text-indigo-600' : 'text-gray-400'); ?>">
+                                <?php echo e(ceil($displayRating)); ?>
+
                             </span>
                         </td>
                         <td>
-                            {{-- ★新規追加: 詳細ボタン★ --}}
-                            <a href="{{ route('product.show', [$product, 'page' => $products->currentPage()]) }}" class="btn btn-detail">
+                            
+                            <a href="<?php echo e(route('product.show', [$product, 'page' => $products->currentPage()])); ?>" class="btn btn-detail">
                                 詳細
                             </a>
                         </td>
                     </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr class="no-result-row">
                         <td colspan="5" class="no-result">該当する商品が見つかりませんでした。</td>
                     </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    {{-- 3. ページネーションリンク --}}
+    
     <div class="mt-8">
-        {{-- ページネーションリンクを生成し、検索条件を維持します --}}
-        {{ $products->appends(request()->input())->links() }}
+        
+        <?php echo e($products->appends(request()->input())->links()); ?>
+
     </div>
 
-    {{-- トップに戻るリンク --}}
-    <a href="{{ route('top') }}">
+    
+    <a href="<?php echo e(route('top')); ?>">
         <button type="button" class="base-button secondary-button submit-center-button">トップに戻る</button>
     </a>
 
@@ -275,3 +280,4 @@
 </script>
 </body>
 </html>
+<?php /**PATH /home/erika/laravel/resources/views/product/list.blade.php ENDPATH**/ ?>

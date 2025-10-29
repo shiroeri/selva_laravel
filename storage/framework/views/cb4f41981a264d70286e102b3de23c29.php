@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商品詳細: {{ $product->name }}</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <title>商品詳細: <?php echo e($product->name); ?></title>
+    <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Interフォントと基本的な背景色を設定 */
@@ -151,116 +151,119 @@
 <body>
     <div class="container">
         
-        {{-- ★配置変更★ 画面固定を解除し、container内の右上に配置 --}}
-        <a href="{{ route('top') }}" class="btn btn-top absolute-top-right">
+        
+        <a href="<?php echo e(route('top')); ?>" class="btn btn-top absolute-top-right">
             トップに戻る
         </a>
 
         <header class="mb-6">
-            {{-- h1タグの境界線がボタンと重なるため、ボタンの下に配置する --}}
+            
             <h1>商品詳細</h1>
         </header>
 
         <section class="product-info">
-            {{-- カテゴリ情報 --}}
+            
             <div class="info-row">
                 <!-- <div class="info-label">商品カテゴリ</div> -->
                 <div class="info-content">
-                    {{-- 大カテゴリ --}}
+                    
                     <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
-                        {{ $product->category->name ?? '---' }}
+                        <?php echo e($product->category->name ?? '---'); ?>
+
                     </span>
                     <span class="mx-1">></span>
-                    {{-- 小カテゴリ --}}
+                    
                     <span class="bg-indigo-100 text-indigo-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
-                        {{ $product->subcategory->name ?? '---' }}
+                        <?php echo e($product->subcategory->name ?? '---'); ?>
+
                     </span>
                    
                 </div>
             </div>
         
-            {{-- 商品名 --}}
+            
             <div class="info-row">
                 <!-- <div class="info-label">商品名</div> -->
-                <div class="info-content font-bold text-xl">{{ $product->name }}</div>
+                <div class="info-content font-bold text-xl"><?php echo e($product->name); ?></div>
             </div>
 
-            {{-- 登録日・更新日 --}}
+            
              <div class="mt-6 text-sm text-gray-500 flex justify-between">
-                <div>更新日時: {{ $product->updated_at->format('Y/m/d H:i') }}</div>
+                <div>更新日時: <?php echo e($product->updated_at->format('Y/m/d H:i')); ?></div>
             </div>
 
             
             
-            {{-- 商品写真 (最大4枚) --}}
+            
             <!-- <h2 class="text-xl font-semibold mt-8 mb-4 text-gray-700">商品写真</h2> -->
             <div class="image-gallery">
-                @for ($i = 1; $i <= 4; $i++)
-                    @php
+                <?php for($i = 1; $i <= 4; $i++): ?>
+                    <?php
                         // DBに保存されている画像パスを取得（例: products/1_16788...jpg）
                         $image_path = $product->{'image_' . $i};
-                    @endphp
-                    @if ($image_path)
+                    ?>
+                    <?php if($image_path): ?>
                         <div class="image-box">
-                            {{-- asset('storage/...') で公開URLを生成 --}}
-                            <img src="{{ asset('storage/' . $image_path) }}" 
-                                 alt="商品写真 {{ $i }}"
+                            
+                            <img src="<?php echo e(asset('storage/' . $image_path)); ?>" 
+                                 alt="商品写真 <?php echo e($i); ?>"
                                  onerror="this.onerror=null; this.src='https://placehold.co/150x150/cccccc/333333?text=画像なし'">
                         </div>
-                    @else
-                        {{-- 画像がない場合は「画像なし」を表示 --}}
+                    <?php else: ?>
+                        
                         <div class="image-box flex items-center justify-center text-sm text-gray-500">
                             画像なし
                         </div>
-                    @endif
-                @endfor
+                    <?php endif; ?>
+                <?php endfor; ?>
             </div>
 
-            {{-- 商品説明 --}}
+            
             <h2 class="text-xl font-semibold mt-8 mb-4 text-gray-700">商品説明</h2>
-            <div class="description-box">{{ $product->product_content }}</div>
+            <div class="description-box"><?php echo e($product->product_content); ?></div>
             
         </section>
 
-        {{-- ★★★ 商品レビューセクションの読み込み ★★★ --}}
-        {{-- product/showDetailメソッドから渡される $product, $reviews, $averageEvaluation, $reviewCount, $hasReviewed を利用 --}}
-        @include('product.review_section')
-        {{-- ★★★ 読み込み終了 ★★★ --}}
+        
+        
+        <?php echo $__env->make('product.review_section', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        
 
-        {{-- ボタン群 --}}
+        
         <div class="btn-group">
-            @php
+            <?php
                 // Sessionから、ProductController@showDetailで保存した一覧画面へ戻るべきページ番号を取得
                 $sourcePage = session('product_list_source_page', 1);
                 
                 // 戻り先のURLを生成。
                 $backUrl = route('product.list', ['page' => $sourcePage]);
-            @endphp
+            ?>
             
-            {{-- 「商品一覧に戻る」ボタン: 元のページに戻る --}}
-            <a href="{{ $backUrl }}" class="btn btn-back">
+            
+            <a href="<?php echo e($backUrl); ?>" class="btn btn-back">
                 商品一覧に戻る
             </a>
             
-            {{-- ★★★ ここからレビューボタンの追加 ★★★ --}}
-            @auth
-                {{-- ログイン済みの場合のみ表示 --}}
-                {{-- $hasReviewed は ReviewController@getReviewDataForProductShow から渡されます --}}
+            
+            <?php if(auth()->guard()->check()): ?>
                 
-                    <a href="{{ route('product.review.create', $product) }}" class="btn btn-review">
+                
+                
+                    <a href="<?php echo e(route('product.review.create', $product)); ?>" class="btn btn-review">
                         この商品についてのレビューを登録
                     </a>
                 
-                    <!-- {{-- 既にレビュー投稿済みの場合、ボタンの代わりにメッセージを表示 --}}
+                    <!-- 
                     <div class="text-pink-600 font-semibold p-3 border border-pink-300 bg-pink-50 rounded-lg flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         この商品には既にレビューを投稿済みです
                     </div> -->
                 
-            @endauth
-            {{-- ★★★ レビューボタンの追加終了 ★★★ --}}
+            <?php endif; ?>
+            
 
         </div>
     </div>
 </body>
 </html>
+<?php /**PATH /home/erika/laravel/resources/views/product/show.blade.php ENDPATH**/ ?>

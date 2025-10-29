@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 // 必要なリレーション先モデルをインポート
 use App\Models\ProductSubcategory; 
 use App\Models\ProductCategory; // ★追加：ProductCategoryモデルをインポート★
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -46,6 +47,18 @@ class Product extends Model
         return $this->belongsTo(Member::class, 'member_id');
     }
     
+    /**
+     * Product は複数のレビューを持つ (1対多)
+     *
+     * @return HasMany
+     */
+    public function reviews(): HasMany
+    {
+        // 関連する Review モデルを指定します。
+        // デフォルトでは、'reviews' テーブルと 'product_id' 外部キーが使用されます。
+        return $this->hasMany(Review::class);
+    }
+
     /**
      * リレーションシップ: この商品が属するサブカテゴリ
      */
