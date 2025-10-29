@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TopController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\MyPageController; // ★追加：マイページコントローラをインポート
+use App\Http\Controllers\WithdrawController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -113,6 +114,12 @@ Route::middleware('auth')->group(function () {
     // 仕様: マイページはログイン時のみ遷移可能
     Route::get('/mypage', [MyPageController::class, 'index'])->name('mypage.index');
     // ★★★ マイページ機能のルート設定（ここまで） ★★★
+
+    // 退会確認画面へのルート
+    Route::get('/withdraw', [WithdrawController::class, 'showWithdrawForm'])->name('withdraw.confirm');
+    
+    // 退会処理を実行するルート (POST)
+    Route::post('/withdraw', [WithdrawController::class, 'withdraw'])->name('withdraw');
 
 });
 
