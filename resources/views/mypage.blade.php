@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 20px;/
         }
         .mypage-container {
             max-width: 600px;
@@ -16,7 +16,7 @@
             padding: 30px;
             background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* シャドウを強調 */
         }
         h1 {
             border-bottom: 2px solid #ccc;
@@ -36,14 +36,24 @@
             cursor: pointer;
             text-decoration: none;
             font-size: 14px;
+            display: inline-block;
+            text-align: center;
         }
         .btn-return {
             background-color: #eee;
             color: #333;
+            transition: background-color 0.3s;
+        }
+        .btn-return:hover {
+            background-color: #ddd;
         }
         .btn-logout {
             background-color: #dc3545;
             color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-logout:hover {
+            background-color: #c82333;
         }
         .info-row {
             display: flex;
@@ -60,6 +70,37 @@
             flex-grow: 1;
             color: #000;
         }
+        
+        /* --- 退会ボタンのスタイルを追加/調整 --- */
+        .withdraw-area {
+            margin-top: 30px;
+            text-align: center; /* ボタンを中央に配置 */
+        }
+
+        .btn-withdraw {
+            /* 基本デザイン */
+            display: inline-block;
+            padding: 10px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #2a64a3; /* 文字色: 青 */
+            background-color: #ffffff; /* 背景色: 白 */
+            border: 2px solid #a8c8e8; /* 枠線: 薄い青 */
+            border-radius: 25px; /* 角丸を大きく */
+            text-decoration: none;
+            cursor: pointer;
+            
+            /* 立体感・影の追加 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-withdraw:hover {
+            background-color: #f0f8ff; /* ホバーで少し明るく */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* ホバーで影を強調 */
+            transform: translateY(-2px);
+        }
+        /* --- スタイルここまで --- */
     </style>
 </head>
 <body>
@@ -72,7 +113,6 @@
                 <a href="{{ route('top') }}" class="btn-return">トップに戻る</a>
                 
                 <!-- 仕様: 「ログアウト」ボタン -->
-                <!-- ログアウトはPOSTリクエストで行うためフォームを使用 -->
                 <form method="POST" action="{{ route('logout') }}" style="display: inline-block;">
                     @csrf
                     <button type="submit" class="btn-logout">ログアウト</button>
@@ -118,6 +158,13 @@
                 <div class="info-label">メールアドレス</div>
                 <div class="info-value">{{ $user->email }}</div>
             </div>
+        </div>
+        
+        <!-- 退会ボタンを中央に配置するエリア -->
+        <div class="withdraw-area">
+            <a href="{{ route('withdraw.confirm') }}" class="btn-withdraw">
+                退会
+            </a>
         </div>
     </div>
 </body>
