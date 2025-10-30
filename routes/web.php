@@ -10,6 +10,9 @@ use App\Http\Controllers\TopController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\MyPageController; // ★追加：マイページコントローラをインポート
 use App\Http\Controllers\WithdrawController;
+use App\Http\Controllers\MemberEditController;
+use App\Http\Controllers\MemberPasswordController; // ★追加：パスワード変更コントローラをインポート
+use App\Http\Controllers\MemberEmailController; // ★重要追加：メールアドレス変更コントローラをインポート
 
 Route::get('/', function () {
     return view('welcome');
@@ -109,6 +112,23 @@ Route::middleware('auth')->group(function () {
     });
 
     // ★★★ ここまでレビュー投稿ルート ★★★
+    
+    // ★★★ メールアドレス変更機能のルート設定 (ここから) ★★★
+    Route::controller(MemberEmailController::class)->group(function () {
+        // 1. フォーム表示 (GET: /member/email/form)
+        Route::get('/member/email/form', 'showForm')->name('member.email.show-form');
+
+        // 2. 認証メール送信処理 (POST: /member/email/send-auth-code)
+        Route::post('/member/email/send-auth-code', 'sendAuthCode')->name('member.email.send-auth-code');
+
+        // 3. 認証コード入力フォーム表示 (GET: /member/email/verify)
+        Route::get('/member/email/verify', 'showVerifyForm')->name('member.email.show-verify-form');
+        
+        // 4. 認証コード検証と更新完了処理 (POST: /member/email/verify-code)
+        Route::post('/member/email/verify-code', 'verifyCode')->name('member.email.verify-code');
+    });
+    // ★★★ メールアドレス変更機能のルート設定 (ここまで) ★★★
+
 
     // ★★★ マイページ機能のルート設定（ここを追加しました） ★★★
     // 仕様: マイページはログイン時のみ遷移可能
@@ -120,6 +140,28 @@ Route::middleware('auth')->group(function () {
     
     // 退会処理を実行するルート (POST)
     Route::post('/withdraw', [WithdrawController::class, 'withdraw'])->name('withdraw');
+
+    // 1. フォーム表示 (GET: /member/edit)
+    Route::get('/member/edit', [MemberEditController::class, 'form'])->name('member.edit.form');
+
+    // 2. 確認画面へ遷移 (POST: /member/edit/confirm)
+    Route::post('/member/edit/confirm', [MemberEditController::class, 'confirm'])->name('member.edit.confirm');
+
+    // 3. 変更完了 (DB更新) (POST: /member/edit/update)
+    Route::post('/member/edit/update', [MemberEditController::class, 'update'])->name('member.edit.update');
+
+    // 4. 完了画面 (GET: /member/edit/complete)
+    Route::get('/member/edit/complete', [MemberEditController::class, 'complete'])->name('member.edit.complete');
+
+    // ★★★ パスワード変更機能のルート設定 (ここから) ★★★
+    // 5. パスワード変更フォームの表示 (GET: /member/password/edit)
+    Route::get('/member/password/edit', [MemberPasswordController::class, 'showForm'])
+        ->name('member.password.edit.form');
+
+    // 6. パスワード更新処理の実行 (POST: /member/password/update)
+    Route::post('/member/password/update', [MemberPasswordController::class, 'update'])
+        ->name('member.password.update');
+    // ★★★ パスワード変更機能のルート設定 (ここまで) ★★★
 
 });
 

@@ -147,10 +147,59 @@
                 </div>
             </div>
 
+            <div style="text-align: center; padding: 20px;">
+                <!-- 
+                    Laravelの route() ヘルパ関数を使用して、
+                    MemberEditControllerの form メソッドに対応するURL（/member/edit）を生成します。
+                -->
+                <a href="{{ route('member.edit.form') }}" 
+                   style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        border: none;
+                        transition: background-color 0.3s;
+                   "
+                   onmouseover="this.style.backgroundColor='#0056b3'"
+                   onmouseout="this.style.backgroundColor='#007bff'">
+                    会員情報変更
+                </a>
+            </div>
+
+
             <!-- パスワード (仕様: セキュリティのため非表示) -->
             <div class="info-row">
                 <div class="info-label">パスワード</div>
                 <div class="info-value" style="color: red;">セキュリティのため非表示</div>
+            </div>
+
+            <div style="text-align: center; padding: 20px;">
+                <!-- 
+                    Laravelの route() ヘルパ関数を使用して、
+                    MemberEditControllerの form メソッドに対応するURL（/member/edit）を生成します。
+                -->
+                <a href="{{ route('member.password.edit.form') }}" 
+                   style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        border: none;
+                        transition: background-color 0.3s;
+                   "
+                   onmouseover="this.style.backgroundColor='#0056b3'"
+                   onmouseout="this.style.backgroundColor='#007bff'">
+                    パスワード変更
+                </a>
             </div>
 
             <!-- メールアドレス -->
@@ -158,6 +207,31 @@
                 <div class="info-label">メールアドレス</div>
                 <div class="info-value">{{ $user->email }}</div>
             </div>
+
+            <div style="text-align: center; padding: 20px;">
+                <!-- 
+                    Laravelの route() ヘルパ関数を使用して、
+                    MemberEditControllerの form メソッドに対応するURL（/member/edit）を生成します。
+                -->
+                <a href="{{ route('member.email.show-form') }}" 
+                   style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        border: none;
+                        transition: background-color 0.3s;
+                   "
+                   onmouseover="this.style.backgroundColor='#0056b3'"
+                   onmouseout="this.style.backgroundColor='#007bff'">
+                    メールアドレス変更
+                </a>
+            </div>
+
         </div>
         
         <!-- 退会ボタンを中央に配置するエリア -->
