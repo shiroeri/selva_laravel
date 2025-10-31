@@ -232,6 +232,30 @@
                 </a>
             </div>
 
+            <div style="text-align: center; padding: 20px;">
+                <!-- 
+                    Laravelの route() ヘルパ関数を使用して、
+                    MemberEditControllerの form メソッドに対応するURL（/member/edit）を生成します。
+                -->
+                <a href="{{ route('mypage.reviews.index') }}" 
+                   style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        border: none;
+                        transition: background-color 0.3s;
+                   "
+                   onmouseover="this.style.backgroundColor='#0056b3'"
+                   onmouseout="this.style.backgroundColor='#007bff'">
+                    商品レビュー管理
+                </a>
+            </div>
+
         </div>
         
         <!-- 退会ボタンを中央に配置するエリア -->

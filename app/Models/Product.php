@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-// 必要なリレーション先モデルをインポート
 use App\Models\ProductSubcategory; 
-use App\Models\ProductCategory; // ★追加：ProductCategoryモデルをインポート★
+use App\Models\ProductCategory; 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
@@ -23,8 +23,6 @@ class Product extends Model
 
     /**
      * The attributes that are mass assignable.
-     * 一括代入（Product::create()）を許可するカラムを定義します。
-     * ProductControllerのexecuteStoreメソッドで使用するカラムをすべて含めます。
      */
     protected $fillable = [
         'member_id',
@@ -42,27 +40,28 @@ class Product extends Model
     /**
      * リレーションシップ: この商品を出品した会員
      */
-    public function member()
+    public function member(): BelongsTo // 型ヒント追加
     {
         return $this->belongsTo(Member::class, 'member_id');
     }
     
     /**
      * Product は複数のレビューを持つ (1対多)
+     * ★修正しました: ProductReview::class から Review::class に戻します。★
      *
      * @return HasMany
      */
     public function reviews(): HasMany
     {
-        // 関連する Review モデルを指定します。
-        // デフォルトでは、'reviews' テーブルと 'product_id' 外部キーが使用されます。
-        return $this->hasMany(Review::class);
+        // コントローラーで使用している App\Models\Review::class を指定します。
+        // ProductReview::class ではありません。
+        return $this->hasMany(Review::class, 'product_id');
     }
 
     /**
      * リレーションシップ: この商品が属するサブカテゴリ
      */
-    public function subcategory()
+    public function subcategory(): BelongsTo // 型ヒント追加
     {
         // 外部キー 'product_subcategory_id' を使用して ProductSubcategory モデルと関連付けます。
         return $this->belongsTo(ProductSubcategory::class, 'product_subcategory_id');
@@ -70,11 +69,28 @@ class Product extends Model
 
     /**
      * リレーションシップ: この商品が属するカテゴリ (大)
-     * ★追加されたメソッド★
      */
-    public function category()
+    public function category(): BelongsTo // 型ヒント追加
     {
         // 外部キー 'product_category_id' を使用して ProductCategory モデルと関連付けます。
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
+
+    /**
+     * アクセサ: 商品の画像URLを生成します。
+     * ビューで $product->image_url として使用され、画像が表示されない問題を解決します。
+     * @return string
+     */
+    public function getImageUrlAttribute(): string
+    {
+        // image_1 カラムが設定されているか確認
+        if ($this->image_1) {
+            // storage/products/xxx.jpg のようなパスを想定
+            return asset('storage/' . $this->image_1);
+        }
+        
+        // 画像パスが設定されていない場合は、商品名に基づいたダミー画像URLを生成
+        $hash = substr(md5($this->name ?? 'default'), 0, 6);
+        return "https://placehold.co/80x80/{$hash}/ffffff?text=Product";
     }
 }
