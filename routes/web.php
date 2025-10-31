@@ -8,11 +8,12 @@ use App\Http\Controllers\PasswordReminderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TopController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\MyPageController; // ★追加：マイページコントローラをインポート
+use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\WithdrawController;
 use App\Http\Controllers\MemberEditController;
-use App\Http\Controllers\MemberPasswordController; // ★追加：パスワード変更コントローラをインポート
-use App\Http\Controllers\MemberEmailController; // ★重要追加：メールアドレス変更コントローラをインポート
+use App\Http\Controllers\MemberPasswordController;
+use App\Http\Controllers\MemberEmailController;
+use App\Http\Controllers\Mypage\ReviewController as MypageReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -133,6 +134,29 @@ Route::middleware('auth')->group(function () {
     // ★★★ マイページ機能のルート設定（ここを追加しました） ★★★
     // 仕様: マイページはログイン時のみ遷移可能
     Route::get('/mypage', [MyPageController::class, 'index'])->name('mypage.index');
+    // ★★★ マイページ機能のルート設定（ここまで） ★★★
+
+    // 【修正点】マイページ内のレビュー管理ルート (MypageReviewControllerを使用)    
+    Route::prefix('mypage/reviews')->name('mypage.reviews.')->controller(MypageReviewController::class)->group(function () {    
+        // 1. 自分のレビュー一覧表示 (GET: /mypage/reviews)    
+        Route::get('/', 'index')->name('index');    
+        
+        // 2. レビュー編集フォーム表示 (GET: /mypage/reviews/{review}/edit) 
+        Route::get('/{review}/edit', 'edit')->name('edit'); 
+        
+        // 3. レビュー編集内容確認 (POST: /mypage/reviews/{review}/confirm)   
+        Route::post('/{review}/confirm', 'confirm')->name('confirm');   
+
+        // ★★★ 欠けていた削除確認ルートを追加 ★★★
+        // 削除確認フォーム表示 (GET: /mypage/reviews/{review}/delete/confirm)
+        Route::get('/{review}/delete/confirm', 'deleteConfirm')->name('deleteConfirm');
+        
+        // 4. レビュー更新実行 (PUT/PATCH: /mypage/reviews/{review})    
+        Route::put('/{review}', 'update')->name('update');  
+        
+        // 5. レビュー削除実行 (DELETE: /mypage/reviews/{review})   
+        Route::delete('/{review}', 'destroy')->name('destroy'); 
+    }); 
     // ★★★ マイページ機能のルート設定（ここまで） ★★★
 
     // 退会確認画面へのルート
