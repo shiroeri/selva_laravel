@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // --- 管理者用のガードを追加 ---
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'administrators', // 下で定義する管理者プロバイダーを参照
+        ],
     ],
 
     /*
@@ -65,10 +70,11 @@ return [
             'model' => App\Models\Member::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // --- 管理者用のプロバイダーを追加 ---
+        'administrators' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Administrator::class, // 作成したAdministratorモデルを参照
+        ],
     ],
 
     /*
@@ -97,6 +103,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        // 管理者用のパスワードリセットは、必要に応じてここに追加します。
     ],
 
     /*

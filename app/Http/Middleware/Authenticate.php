@@ -8,11 +8,33 @@ use Illuminate\Http\Request;
 class Authenticate extends Middleware
 {
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * @var array
+     * 親クラス (Illuminate\Auth\Middleware\Authenticate) でprotectedとして定義されているプロパティを、
+     * IDEの静的解析エラーを回避するために明示的に宣言します。
+     */
+    protected $guards;
+    
+    /**
+     * ユーザーが認証されていない場合にリダイレクトすべきパスを取得します。
      */
     protected function redirectTo(Request $request): ?string
     {
-        // 未認証の場合、ログインページにリダイレクトします
-        return $request->expectsJson() ? null : route('login');
+        if (! $request->expectsJson()) {
+            
+            // ----------------------------------------------------
+            // 💡 修正ポイント: リクエストURLのパスで判定する 
+            // ----------------------------------------------------
+            
+            // 1. リクエストされたURLのパスが '/admin' で始まるかを確認
+            //    -> 管理者系のルートにアクセスしようとしていると判断
+            if ($request->is('admin/*') || $request->is('admin')) {
+                return route('admin.login');
+            }
+            
+            // 2. それ以外（通常のユーザーログイン）
+            return route('login');
+        }
+
+        return null;
     }
 }

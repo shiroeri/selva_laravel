@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ProductCategorySeeder::class, // product_categoriesテーブルにデータを投入
             ProductSubcategorySeeder::class, // product_subcategoriesテーブルにデータを投入
+            AdminSeeder::class, // administersテーブルにデータを投入
             // 必要に応じて、MemberSeederなどをここに追加します。
         ]);
     }

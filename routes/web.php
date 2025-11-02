@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+// 管理者コントローラー
+use App\Http\Controllers\Admin\AdminController; 
+// 会員側コントローラー
 use App\Http\Controllers\HelloController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PasswordReminderController;
@@ -14,6 +17,9 @@ use App\Http\Controllers\MemberEditController;
 use App\Http\Controllers\MemberPasswordController;
 use App\Http\Controllers\MemberEmailController;
 use App\Http\Controllers\Mypage\ReviewController as MypageReviewController;
+// Admin\LoginController を AdminLoginController という名前で参照します。
+use App\Http\Controllers\Admin\LoginController as AdminLoginController; 
+use App\Http\Middleware\AdminAuthenticate;
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,7 +73,37 @@ Route::controller(PasswordReminderController::class)->group(function () {
     Route::post('/password/update', 'updatePassword')->name('password.update');
 });
 
-// 認証が必要なルートグループ
+
+
+// =========================================================================
+// ★★★ 管理者側: メインルートグループ ★★★
+// =========================================================================
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // 認証不要ルート
+    Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AdminLoginController::class, 'login'])->name('login.post');
+
+    // ---------------------------------------------------------------------
+    // 認証必須ルート (ミドルウェアを直接指定)
+    // ---------------------------------------------------------------------
+    Route::middleware([AdminAuthenticate::class])->group(function () {
+
+        // ログアウト実行（認証済みユーザーのみ実行可能）
+        Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
+        
+        // 管理者トップページ (★一時的にミドルウェアから外す)
+        Route::get('top', [AdminController::class, 'index'])->name('top');
+        
+        // ... (他の認証が必要な管理者ページ)
+    });
+});
+
+
+
+// =========================================================================
+// ★★★ 会員側: 認証が必要なルートグループ（既存のauthミドルウェア） ★★★
+// =========================================================================
 Route::middleware('auth')->group(function () {
     
     // 【追加】Ajaxによる小カテゴリ取得ルート
