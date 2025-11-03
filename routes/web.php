@@ -20,6 +20,7 @@ use App\Http\Controllers\Mypage\ReviewController as MypageReviewController;
 // Admin\LoginController を AdminLoginController という名前で参照します。
 use App\Http\Controllers\Admin\LoginController as AdminLoginController; 
 use App\Http\Middleware\AdminAuthenticate;
+use App\Http\Controllers\Admin\MemberController as AdminMemberController; // 管理者向け会員コントローラ
 
 Route::get('/', function () {
     return view('welcome');
@@ -94,6 +95,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // 管理者トップページ (★一時的にミドルウェアから外す)
         Route::get('top', [AdminController::class, 'index'])->name('top');
+
+        // 【統合】会員一覧・検索・並べ替え機能のルート
+        // URL: /admin/members , 名前: admin.member.index
+        Route::get('members', [AdminMemberController::class, 'index'])->name('member.index');
         
         // ... (他の認証が必要な管理者ページ)
     });
