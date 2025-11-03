@@ -16,6 +16,10 @@ class Member extends Authenticatable
     use HasFactory;
     use Notifiable; // 通知機能を仮に追加
 
+    // --- 【追加】性別コード（DB値）の定数 ---
+    public const GENDER_MALE = 1;
+    public const GENDER_FEMALE = 2;
+
     /**
      * The attributes that are mass assignable.
      * マスアサインメントを許可する属性（カラム）
@@ -65,5 +69,24 @@ class Member extends Authenticatable
         // 姓と名を結合してフルネームを返します。
         // スペース区切りが必要な場合は return $this->name_sei . ' ' . $this->name_mei; に変更してください。
         return $this->name_sei . $this->name_mei; 
+    }
+
+
+    // --- 【追加】性別コードを文字列に変換するアクセサ ---
+    /**
+     * 性別コードを文字列に変換するアクセサ
+     *
+     * @return string
+     */
+    public function getGenderNameAttribute(): string
+    {
+        switch ($this->gender) {
+            case self::GENDER_MALE:
+                return '男性';
+            case self::GENDER_FEMALE:
+                return '女性';
+            default:
+                return 'その他'; // genderが1, 2以外の場合に対応
+        }
     }
 }
