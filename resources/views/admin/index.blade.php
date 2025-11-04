@@ -43,15 +43,26 @@
         </div>
     </div>
 
+    <!-- 会員登録ボタンを検索フォームの上に配置 -->
+    <div class="p-6 pb-0">
+        <!-- 「admin.member.create」ルートを使用 -->
+        <a href="{{ route('admin.member.create') }}" class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+            会員登録
+        </a>
+    </div>
+
+
     <!-- 検索フォーム --><form action="{{ route('admin.member.index') }}" method="GET" class="p-6 space-y-4">
         <div class="grid grid-cols-1 gap-6 border p-4 rounded-lg bg-gray-50">
-            <!-- ID検索 --><div>
+            <!-- ID検索 -->
+            <div>
                 <label for="id" class="block text-sm font-medium text-gray-700">ID</label>
                 <input type="text" name="id" id="id" value="{{ $searchParams['id'] ?? '' }}"
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
             </div>
 
-            <!-- 性別検索 (チェックボックス) --><div>
+            <!-- 性別検索 (チェックボックス) -->
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">性別</label>
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center space-x-1">
@@ -69,14 +80,16 @@
                 </div>
             </div>
 
-            <!-- フリーワード検索 --><div>
+            <!-- フリーワード検索 -->
+            <div>
                 <label for="freeword" class="block text-sm font-medium text-gray-700">フリーワード</label>
                 <input type="text" name="freeword" id="freeword" value="{{ $searchParams['freeword'] ?? '' }}"
                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
             </div>
         </div>
 
-        <!-- 隠しフィールド: 並べ替えの状態を維持 --><input type="hidden" name="sort_column" value="{{ $sortColumn }}">
+        <!-- 隠しフィールド: 並べ替えの状態を維持 -->
+        <input type="hidden" name="sort_column" value="{{ $sortColumn }}">
         <input type="hidden" name="sort_direction" value="{{ $sortDirection }}">
 
         <div class="text-center pt-4">
@@ -86,12 +99,14 @@
         </div>
     </form>
 
-    <!-- 会員一覧テーブル --><div class="p-6">
+    <!-- 会員一覧テーブル -->
+    <div class="p-6">
         <div class="overflow-x-auto rounded-lg border">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        <!-- 1. ID 並べ替えリンク --><th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                        <!-- 1. ID 並べ替えリンク -->
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                             @php
                                 $newDirection = ($sortColumn == 'id' && $sortDirection == 'desc') ? 'asc' : 'desc'; // 現在降順なら次は昇順
                             @endphp
@@ -107,10 +122,14 @@
                                 @endif
                             </a>
                         </th>
-                        <!-- 氏名 --><th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">氏名</th>
-                        <!-- メールアドレス --><th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">メールアドレス</th>
-                        <!-- 性別 --><th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">性別</th>
-                        <!-- 登録日時 並べ替えリンク --><th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                        <!-- 氏名 -->
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">氏名</th>
+                        <!-- メールアドレス -->
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">メールアドレス</th>
+                        <!-- 性別 -->
+                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">性別</th>
+                        <!-- 登録日時 並べ替えリンク -->
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                             @php
                                 $newDirection = ($sortColumn == 'created_at' && $sortDirection == 'desc') ? 'asc' : 'desc'; // 現在降順なら次は昇順
                             @endphp
@@ -126,6 +145,8 @@
                                 @endif
                             </a>
                         </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">編集</th>
+
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -137,10 +158,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $member->gender_name }}</td>
                         <!-- 修正箇所: 時間表示を削除し、日付のみにする -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $member->created_at->format('Y/m/d') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <!-- 「admin.member.edit」ルートを使用 -->
+                            <a href="{{ route('admin.member.edit', ['member' => $member->id]) }}" class="text-blue-600 hover:text-blue-900 font-semibold">編集</a>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">該当する会員情報はありませんでした。</td>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">該当する会員情報はありませんでした。</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -148,7 +173,8 @@
         </div>
     </div>
 
-    <!-- ページネーション --><div class="p-6 border-t border-gray-200">
+    <!-- ページネーション -->
+    <div class="p-6 border-t border-gray-200">
         {{ $members->links() }}
     </div>
 
