@@ -20,7 +20,8 @@ use App\Http\Controllers\Mypage\ReviewController as MypageReviewController;
 // Admin\LoginController を AdminLoginController という名前で参照します。
 use App\Http\Controllers\Admin\LoginController as AdminLoginController; 
 use App\Http\Middleware\AdminAuthenticate;
-use App\Http\Controllers\Admin\MemberController as AdminMemberController; // 管理者向け会員コントローラ
+// 管理者向け会員コントローラー
+use App\Http\Controllers\Admin\MemberController as AdminMemberController; 
 
 Route::get('/', function () {
     return view('welcome');
@@ -93,14 +94,38 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // ログアウト実行（認証済みユーザーのみ実行可能）
         Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
         
-        // 管理者トップページ (★一時的にミドルウェアから外す)
+        // 管理者トップページ 
         Route::get('top', [AdminController::class, 'index'])->name('top');
 
-        // 【統合】会員一覧・検索・並べ替え機能のルート
-        // URL: /admin/members , 名前: admin.member.index
-        Route::get('members', [AdminMemberController::class, 'index'])->name('member.index');
+        // ----------------------------------------------------
+        // 【統合】会員管理のルート (AdminMemberControllerへ集約)
+        // ----------------------------------------------------
+        Route::controller(AdminMemberController::class)->group(function () {
         
-        // ... (他の認証が必要な管理者ページ)
+            // ★重要：カスタムルートをリソースルートより先に定義する★
+            // 登録時の確認・完了ルート (カスタムルート)
+            // POST /admin/member/confirm -> admin.member.confirm
+            Route::post('member/confirm', 'confirm')->name('member.confirm');
+            // POST /admin/member/complete -> admin.member.complete
+            Route::post('member/complete', 'complete')->name('member.complete');
+
+            // 編集時の確認・完了ルート (IDを必要とするカスタムルート)
+            // PUT/PATCH /admin/member/{member}/confirm -> admin.member.updateConfirm
+            Route::match(['put', 'patch'], 'member/{member}/confirm', 'updateConfirm')->name('member.updateConfirm');
+            // PUT/PATCH /admin/member/{member}/complete -> admin.member.updateComplete
+            Route::match(['put', 'patch'], 'member/{member}/complete', 'updateComplete')->name('member.updateComplete');
+
+            // 会員管理リソースルート (index, create, edit, destroy)
+            // index, create, edit, destroy のみを使用し、store, update はカスタムフローに任せる
+            // リソースが持つ: 
+            // - index: GET /admin/member -> index (会員一覧・検索)
+            // - create: GET /admin/member/create -> create (新規フォーム)
+            // - edit: GET /admin/member/{member}/edit -> edit (編集フォーム)
+            // - destroy: DELETE /admin/member/{member} -> destroy (削除)
+            Route::resource('member', AdminMemberController::class)->except([
+                'show', 'store', 'update'
+            ]); 
+        });
     });
 });
 
