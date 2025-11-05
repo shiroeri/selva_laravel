@@ -115,15 +115,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // PUT/PATCH /admin/member/{member}/complete -> admin.member.updateComplete
             Route::match(['put', 'patch'], 'member/{member}/complete', 'updateComplete')->name('member.updateComplete');
 
-            // 会員管理リソースルート (index, create, edit, destroy)
-            // index, create, edit, destroy のみを使用し、store, update はカスタムフローに任せる
-            // リソースが持つ: 
-            // - index: GET /admin/member -> index (会員一覧・検索)
-            // - create: GET /admin/member/create -> create (新規フォーム)
-            // - edit: GET /admin/member/{member}/edit -> edit (編集フォーム)
-            // - destroy: DELETE /admin/member/{member} -> destroy (削除)
+            // 会員管理リソースルート (index, create, show, edit, destroy)
+            // ★★★ 修正点 ★★★
+            // 'show' を except 配列から削除し、詳細ページ (showメソッド) を有効化します。
             Route::resource('member', AdminMemberController::class)->except([
-                'show', 'store', 'update'
+                'store', 'update' // 'show' を削除
             ]); 
         });
     });

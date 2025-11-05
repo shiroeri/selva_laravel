@@ -146,6 +146,7 @@
                             </a>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">編集</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">詳細</th>
 
                     </tr>
                 </thead>
@@ -153,7 +154,9 @@
                     @forelse ($members as $member)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $member->id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $member->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <a href="{{ route('admin.member.show', ['member' => $member->id]) }}" class="text-blue-600 hover:text-blue-900 font-semibold">{{ $member->name }}</a>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $member->email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $member->gender_name }}</td>
                         <!-- 修正箇所: 時間表示を削除し、日付のみにする -->
@@ -161,6 +164,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <!-- 「admin.member.edit」ルートを使用 -->
                             <a href="{{ route('admin.member.edit', ['member' => $member->id]) }}" class="text-blue-600 hover:text-blue-900 font-semibold">編集</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <a href="{{ route('admin.member.show', ['member' => $member->id]) }}" class="text-blue-600 hover:text-blue-900 font-semibold">詳細</a>
                         </td>
                     </tr>
                     @empty
