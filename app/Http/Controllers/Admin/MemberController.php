@@ -219,6 +219,23 @@ class MemberController extends Controller
         }   
     }   
 
+    /**
+     * 会員詳細の表示
+     * GET /admin/member/{member}
+     *
+     * @param Member $member
+     * @return \Illuminate\View\View
+     */
+    public function show(Member $member)
+    {
+        // ルートモデルバインディングで$memberが取得される
+        // 関連レビューの数を読み込む (任意)
+        // $member->loadCount('reviews'); 
+        
+        return view('admin.member.show', compact('member'));
+    }
+
+
     /** * 会員編集フォームの表示  
      * GET /admin/member/{member}/edit  
      * * @param Member $member    
@@ -341,7 +358,10 @@ class MemberController extends Controller
         }   
     }   
 
-    /** * 会員削除処理   
+    /** 
+     * 会員削除処理
+     * 関連するレビューもソフトデリートする機能を追加
+     *   
      * DELETE /admin/member/{member}    
      * * @param Member $member    
      * @return \Illuminate\Http\RedirectResponse    
@@ -349,11 +369,19 @@ class MemberController extends Controller
     public function destroy(Member $member) 
     {   
         try {   
-            // 削除実行 (SoftDeletesが有効であることを想定)    
-            $member->delete();  
+            // トランザクション内で削除処理
+            DB::transaction(function () use ($member) {
+                // 設計書通り、関連するレビューを先にソフトデリート
+                // (Memberモデルに reviews() リレーションが定義されている必要があります)
+                // (また、Reviewモデルも SoftDeletes を use している必要があります)
+                $member->reviews()->delete();
+                
+                // 会員自体をソフトデリート
+                $member->delete();  
+            });
             
             return redirect()->route('admin.member.index')  
-                            ->with('success', '会員（ID: ' . $member->id . '）を削除しました。');
+                            ->with('success', '会員（ID: ' . $member->id . '）と関連レビューを削除しました。');
         } catch (\Exception $e) {   
             \Log::error('Admin Member Deletion Error: ' . $e->getMessage());    
             return redirect()->route('admin.member.index')  
