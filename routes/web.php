@@ -21,7 +21,9 @@ use App\Http\Controllers\Mypage\ReviewController as MypageReviewController;
 use App\Http\Controllers\Admin\LoginController as AdminLoginController; 
 use App\Http\Middleware\AdminAuthenticate;
 // 管理者向け会員コントローラー
-use App\Http\Controllers\Admin\MemberController as AdminMemberController; 
+use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+// 管理者向けカテゴリコントローラー	
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -122,6 +124,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 'store', 'update' // 'show' を削除
             ]); 
         });
+        // ----------------------------------------------------
+        // 【新規】商品カテゴリ管理のルート (CategoryControllerへ集約)
+        // ----------------------------------------------------
+        // 商品カテゴリの一覧、検索、並べ替え（indexメソッドのみ利用）
+        Route::resource('category', CategoryController::class)->only([
+            'index' 
+        ]);
+        // indexのルーティングは /admin/category -> admin.category.index となります。
     });
 });
 
