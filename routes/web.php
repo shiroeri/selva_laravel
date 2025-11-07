@@ -22,7 +22,7 @@ use App\Http\Controllers\Admin\LoginController as AdminLoginController;
 use App\Http\Middleware\AdminAuthenticate;
 // 管理者向け会員コントローラー
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
-// 管理者向けカテゴリコントローラー	
+// 管理者向けカテゴリコントローラー 
 use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
@@ -118,20 +118,49 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::match(['put', 'patch'], 'member/{member}/complete', 'updateComplete')->name('member.updateComplete');
 
             // 会員管理リソースルート (index, create, show, edit, destroy)
-            // ★★★ 修正点 ★★★
-            // 'show' を except 配列から削除し、詳細ページ (showメソッド) を有効化します。
             Route::resource('member', AdminMemberController::class)->except([
-                'store', 'update' // 'show' を削除
+                'store', 'update' // 'show' は残し、詳細ページを有効化
             ]); 
         });
         // ----------------------------------------------------
         // 【新規】商品カテゴリ管理のルート (CategoryControllerへ集約)
         // ----------------------------------------------------
-        // 商品カテゴリの一覧、検索、並べ替え（indexメソッドのみ利用）
-        Route::resource('category', CategoryController::class)->only([
-            'index' 
-        ]);
-        // indexのルーティングは /admin/category -> admin.category.index となります。
+        Route::controller(CategoryController::class)->group(function () {
+            
+            // ★重要：カスタムルートをリソースルートより先に定義する★
+            
+            // 1. 登録確認ルート (POST /admin/category/confirm) <--- 修正しました
+            // POST /admin/category/confirm -> admin.category.confirm
+            Route::post('category/confirm', 'confirm')->name('category.confirm');
+            // POST /admin/category/complete -> admin.category.complete
+            Route::post('category/complete', 'complete')->name('category.complete');
+            
+            // 2. 編集確認ルート (IDを必要とするカスタムルート)
+            // POST /admin/category/{category}/update_confirm -> admin.category.update_confirm
+            // Route::post('category/{category}/update_confirm', 'updateConfirm')->name('category.update_confirm');
+
+            // 編集時の確認・完了ルート (IDを必要とするカスタムルート)
+            // PUT/PATCH /admin/category/{category}/confirm -> admin.category.updateConfirm
+            Route::match(['put', 'patch'], 'category/{category}/confirm', 'updateConfirm')->name('category.updateConfirm');
+            // PUT/PATCH /admin/member/{member}/complete -> admin.member.updateComplete
+            Route::match(['put', 'patch'], 'category/{category}/complete', 'updateComplete')->name('category.updateComplete');
+
+            // リソースルート (index, create, store, edit, update, destroy) を定義
+            // confirmルートをカスタム定義したため、showは除外
+            Route::resource('category', CategoryController::class)->except([
+                'show' 
+            ]);
+            
+            // ルート一覧:
+            // index: GET /admin/category -> admin.category.index
+            // create: GET /admin/category/create -> admin.category.create (登録フォーム)
+            // store: POST /admin/category -> admin.category.store (登録実行)
+            // edit: GET /admin/category/{category}/edit -> admin.category.edit (編集フォーム)
+            // update: PUT/PATCH /admin/category/{category} -> admin.category.update (編集実行)
+            // destroy: DELETE /admin/category/{category} -> admin.category.destroy (削除実行)
+            // confirm (カスタム): POST /admin/category/confirm -> admin.category.confirm (登録確認)
+            // update_confirm (カスタム): POST /admin/category/{category}/update_confirm -> admin.category.update_confirm (編集確認)
+        });
     });
 });
 

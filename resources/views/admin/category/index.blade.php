@@ -40,6 +40,15 @@
                 トップへ戻る
             </a>
         </div>
+
+        <!-- 商品カテゴリ登録ボタン -->
+        <div class="p-6 pb-0">
+            <a href="{{ route('admin.category.create') }}" class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+                商品カテゴリ登録
+            </a>
+        </div>
+
+        <br>
         
         <!-- 検索フォーム -->
         <div class="bg-white shadow-xl rounded-xl p-6 mb-8">
@@ -86,40 +95,40 @@
                             <!-- IDヘッダー: ソート可能 (初期降順) -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                                 @php
-                                    $newDirection = ($sortColumn == 'id' && $sortDirection == 'desc') ? 'asc' : 'desc'; // 現在降順なら次は昇順
+                                    $newDirection = ($sortColumn == 'id' && $sortDirection == 'desc') ? 'asc' : 'desc'; 
                                 @endphp
                                 <a href="{{ route('admin.category.index', array_merge($searchParams, ['sort_column' => 'id', 'sort_direction' => $newDirection, 'page' => 1])) }}"
-                                   class="table-header-link">
+                                   class="header-link flex items-center">
                                     ID
                                     @if($sortColumn == 'id')
-                                        <span class="sort-icon active">
-                                            @if($sortDirection == 'asc') ▲ @else ▼ @endif
+                                        <span class="arrow-icon">
+                                            @if($sortDirection == 'asc') <i class="fas fa-sort-up"></i> @else <i class="fas fa-sort-down"></i> @endif
                                         </span>
                                     @else
-                                        <span class="sort-icon inactive">▲▼</span>
+                                        <span class="arrow-icon text-gray-400"><i class="fas fa-sort"></i></span>
                                     @endif
                                 </a>
                             </th>
                             
-                            <!-- 商品大カテゴリ名ヘッダー (ソート不可) -->
+                            <!-- 商品大カテゴリ名ヘッダー: 静的 (ソート機能は削除) -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/6 header-static">
                                 商品大カテゴリ名
                             </th>
                             
-                            <!-- 登録日時ヘッダー: ソート不可に変更 -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 header-static">
+                            <!-- 登録日時ヘッダー: ソート可能 -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                                 @php
-                                    $newDirection = ($sortColumn == 'created_at' && $sortDirection == 'desc') ? 'asc' : 'desc'; // 現在降順なら次は昇順
+                                    $newDirection = ($sortColumn == 'created_at' && $sortDirection == 'desc') ? 'asc' : 'desc'; 
                                 @endphp
                                 <a href="{{ route('admin.category.index', array_merge($searchParams, ['sort_column' => 'created_at', 'sort_direction' => $newDirection, 'page' => 1])) }}"
-                                   class="table-header-link">
+                                   class="header-link flex items-center">
                                     登録日時
                                     @if($sortColumn == 'created_at')
-                                        <span class="sort-icon active">
-                                            @if($sortDirection == 'asc') ▲ @else ▼ @endif
+                                        <span class="arrow-icon">
+                                            @if($sortDirection == 'asc') <i class="fas fa-sort-up"></i> @else <i class="fas fa-sort-down"></i> @endif
                                         </span>
                                     @else
-                                        <span class="sort-icon inactive">▲▼</span>
+                                        <span class="arrow-icon text-gray-400"><i class="fas fa-sort"></i></span>
                                     @endif
                                 </a>
                             </th>
@@ -144,10 +153,20 @@
                                     <!-- 日付のみを Y/m/d 形式で表示 -->
                                     {{ $category->created_at->format('Y/m/d') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 transition duration-150 mr-4">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
+                                    <!-- ★修正: 'admin.category.edit' ルートを使用し、IDを渡す -->
+                                    <a href="{{ route('admin.category.edit', $category->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
                                         編集
                                     </a>
+                                    
+                                    <!-- 削除ボタン（フォームを使用） -->
+                                    <!-- <form action="{{ route('admin.category.destroy', $category->id) }}" method="POST" onsubmit="return confirm('本当にカテゴリID: {{ $category->id }} を削除してもよろしいですか？\n関連する小カテゴリも削除されます。');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 focus:outline-none">
+                                            削除
+                                        </button>
+                                    </form> -->
                                 </td>
                             </tr>
                         @empty
