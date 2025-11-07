@@ -24,6 +24,9 @@ use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 // 管理者向けカテゴリコントローラー 
 use App\Http\Controllers\Admin\CategoryController;
+// 管理者向け商品コントローラー 
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -161,6 +164,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // show: GET /admin/category/{category} -> admin.category.show (詳細表示)
             // confirm (カスタム): POST /admin/category/confirm -> admin.category.confirm (登録確認)
             // update_confirm (カスタム): POST /admin/category/{category}/confirm -> admin.category.updateConfirm (編集確認)
+        });
+
+        // 【新規】商品管理のルート (ProductControllerへ集約)
+        Route::controller(AdminProductController::class)->group(function () {
+            // index: GET /admin/product -> admin.product.index (一覧・検索・並べ替え)
+            Route::get('product', 'index')->name('product.index'); 
+
+            // 以下、登録、詳細、編集のルートも必要に応じて追加します
+            // Route::get('product/create', 'create')->name('product.create');
+            // Route::get('product/{product}', 'show')->name('product.show');
+            // Route::get('product/{product}/edit', 'edit')->name('product.edit');
         });
     });
 });
