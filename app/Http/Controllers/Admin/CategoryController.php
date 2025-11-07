@@ -128,6 +128,25 @@ class CategoryController extends Controller
     }
 
     /**
+     * 商品カテゴリ詳細を表示する
+     * GET /admin/category/{id}
+     *
+     * @param int $id
+     * @return \Illuminate\View\View
+     */
+    public function show(int $id)
+    {
+        // IDに該当するカテゴリを検索。小カテゴリも同時にロードする
+        // ★修正点：with('subcategories')を使うことで、関連する小カテゴリもロードする。
+        $category = ProductCategory::with('subcategories')->findOrFail($id);
+
+        // 詳細画面へ
+        return view('admin.category.show', [
+            'category' => $category,
+        ]);
+    }
+
+    /**
      * 新規登録フォームを表示する
      * GET /admin/category/create
      *
@@ -372,7 +391,7 @@ class CategoryController extends Controller
     /**
      * 削除処理（論理削除）
      * DELETE /admin/category/{id}
-     * * @param int $id
+     * @param int $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(int $id)
@@ -380,12 +399,17 @@ class CategoryController extends Controller
         $category = ProductCategory::findOrFail($id);
 
         DB::transaction(function () use ($category) {
-            // 大カテゴリを論理削除
-            $category->delete(); 
-            // 関連する小カテゴリも物理削除
-            $category->subcategories()->forceDelete();
+            // 1. 大カテゴリを論理削除 (ProductCategory)
+            $category->delete(); // deleted_atにタイムスタンプが記録される
+
+            // 2. 関連する小カテゴリも論理削除 (ProductSubcategory)
+            // ProductSubcategoryモデルにSoftDeletesトレイトが適用されている前提
+            $category->subcategories()->delete(); 
+            // ※ $category->subcategories()は、deleted_atがnullの小カテゴリのみをデフォルトで取得するため、
+            // 現在アクティブな小カテゴリが論理削除されます。
         });
 
+        // 完了メッセージをセッションに保存して一覧画面へリダイレクト
         return redirect()->route('admin.category.index')->with('status', '商品カテゴリを削除しました。');
     }
 }

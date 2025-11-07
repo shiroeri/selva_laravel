@@ -134,8 +134,11 @@
                             </th>
                             
                             <!-- 編集ヘッダー -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 header-static">
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                                 編集
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                                詳細
                             </th>
                         </tr>
                     </thead>
@@ -146,27 +149,25 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $category->id }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    {{ $category->name }}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"> 
+                                    <a href="{{ route('admin.category.show', $category->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
+                                        {{ $category->name }}
+                                    </a>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <!-- 日付のみを Y/m/d 形式で表示 -->
                                     {{ $category->created_at->format('Y/m/d') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <!-- ★修正: 'admin.category.edit' ルートを使用し、IDを渡す -->
                                     <a href="{{ route('admin.category.edit', $category->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
                                         編集
                                     </a>
-                                    
-                                    <!-- 削除ボタン（フォームを使用） -->
-                                    <!-- <form action="{{ route('admin.category.destroy', $category->id) }}" method="POST" onsubmit="return confirm('本当にカテゴリID: {{ $category->id }} を削除してもよろしいですか？\n関連する小カテゴリも削除されます。');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 focus:outline-none">
-                                            削除
-                                        </button>
-                                    </form> -->
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <a href="{{ route('admin.category.show', $category->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
+                                        詳細
+                                    </a>
                                 </td>
                             </tr>
                         @empty

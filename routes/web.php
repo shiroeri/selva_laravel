@@ -129,28 +129,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
             
             // ★重要：カスタムルートをリソースルートより先に定義する★
             
-            // 1. 登録確認ルート (POST /admin/category/confirm) <--- 修正しました
+            // 1. 登録確認ルート (POST /admin/category/confirm)
             // POST /admin/category/confirm -> admin.category.confirm
             Route::post('category/confirm', 'confirm')->name('category.confirm');
             // POST /admin/category/complete -> admin.category.complete
+            // 注意: storeメソッドで完了処理を行うため、このcompleteルートは使用しない可能性が高いですが、構造を維持します
             Route::post('category/complete', 'complete')->name('category.complete');
             
-            // 2. 編集確認ルート (IDを必要とするカスタムルート)
-            // POST /admin/category/{category}/update_confirm -> admin.category.update_confirm
-            // Route::post('category/{category}/update_confirm', 'updateConfirm')->name('category.update_confirm');
-
             // 編集時の確認・完了ルート (IDを必要とするカスタムルート)
             // PUT/PATCH /admin/category/{category}/confirm -> admin.category.updateConfirm
             Route::match(['put', 'patch'], 'category/{category}/confirm', 'updateConfirm')->name('category.updateConfirm');
             // PUT/PATCH /admin/member/{member}/complete -> admin.member.updateComplete
+            // 注意: updateメソッドで完了処理を行うため、このupdateCompleteルートは使用しない可能性が高いですが、構造を維持します
             Route::match(['put', 'patch'], 'category/{category}/complete', 'updateComplete')->name('category.updateComplete');
 
-            // リソースルート (index, create, store, edit, update, destroy) を定義
-            // confirmルートをカスタム定義したため、showは除外
+            // リソースルート (index, create, store, edit, update, destroy)
             Route::resource('category', CategoryController::class)->except([
                 'show' 
             ]);
             
+            // ★追加: 詳細画面へのルート (GET /admin/category/{category})
+            Route::get('category/{category}', 'show')->name('category.show');
+
             // ルート一覧:
             // index: GET /admin/category -> admin.category.index
             // create: GET /admin/category/create -> admin.category.create (登録フォーム)
@@ -158,8 +158,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // edit: GET /admin/category/{category}/edit -> admin.category.edit (編集フォーム)
             // update: PUT/PATCH /admin/category/{category} -> admin.category.update (編集実行)
             // destroy: DELETE /admin/category/{category} -> admin.category.destroy (削除実行)
+            // show: GET /admin/category/{category} -> admin.category.show (詳細表示)
             // confirm (カスタム): POST /admin/category/confirm -> admin.category.confirm (登録確認)
-            // update_confirm (カスタム): POST /admin/category/{category}/update_confirm -> admin.category.update_confirm (編集確認)
+            // update_confirm (カスタム): POST /admin/category/{category}/confirm -> admin.category.updateConfirm (編集確認)
         });
     });
 });
