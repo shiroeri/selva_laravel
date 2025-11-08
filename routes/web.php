@@ -26,7 +26,8 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Admin\CategoryController;
 // 管理者向け商品コントローラー 
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
-
+// 管理者向け商品コントローラー 
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -209,7 +210,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
             */
         });
 
-        Route::get('review', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('review.index');
+        // レビュー登録・編集（管理画面）
+        Route::controller(AdminReviewController::class)->group(function () {
+            // 一覧（GET /admin/review）
+            Route::get('review', 'index')->name('review.index');
+
+            // 登録フロー
+            Route::get('review/create', 'create')->name('review.create');
+            Route::post('review/confirm', 'confirm')->name('review.confirm');
+            Route::post('review', 'store')->name('review.store');
+
+            // 編集フロー（ID制約付き）
+            Route::get('review/{review}/edit', 'edit')
+                ->whereNumber('review')->name('review.edit');
+
+            // 確認画面（PUT/PATCH 送信）と「戻る用」GET
+            Route::match(['put','patch'], 'review/{review}/confirm', 'updateConfirm')
+                ->whereNumber('review')->name('review.updateConfirm');
+            Route::get('review/{review}/confirm', 'showUpdateConfirm')
+                ->whereNumber('review')->name('review.updateConfirm.get');
+
+            // 更新完了
+            Route::match(['put','patch'], 'review/{review}', 'update')
+                ->whereNumber('review')->name('review.update');
+        });
 
     });
 });
