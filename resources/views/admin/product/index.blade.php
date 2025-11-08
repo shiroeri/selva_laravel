@@ -137,6 +137,9 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 header-static">
                                 編集
                             </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 header-static">
+                                詳細
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -148,9 +151,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"> 
                                     {{-- 詳細画面へのリンク (仮のルート: admin.product.show) --}}
-                                    <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900 transition duration-150"> -->
+                                    <a href="{{ route('admin.product.show', $product->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
                                         {{ $product->name }}
-                                    <!-- </a> -->
+                                    </a>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{-- 日付のみを Y/m/d 形式で表示 --}}
@@ -160,6 +163,11 @@
                                     {{-- 編集画面へのリンク (仮のルート: admin.product.edit) --}}
                                     <a href="{{ route('admin.product.edit', $product->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
                                         編集
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <a href="{{ route('admin.product.show', $product->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
+                                        詳細
                                     </a>
                                 </td>
                             </tr>

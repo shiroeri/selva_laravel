@@ -5,33 +5,42 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes; // SoftDeletesトレイトをインポート
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductReview extends Model
 {
-    // SoftDeletesトレイトを使用することで、delete()実行時にdeleted_atが設定される
-    use HasFactory, SoftDeletes; 
+    use HasFactory, SoftDeletes;
 
-    // ★重要★
-    // 実際のテーブル名が 'reviews' であるため、テーブル名を明示的に指定します。
+    /**
+     * 実テーブル名（仕様：reviews）
+     */
     protected $table = 'reviews';
 
-    // 以下のカラム名がデータベースと一致していることを前提とします
-    // 'product_id', 'member_id', 'evaluation', 'comment'
-
+    /**
+     * 代入可能カラム
+     */
     protected $fillable = [
         'product_id',
         'member_id',
-        'evaluation', // 評価のカラム名
-        'comment',    // コメントのカラム名
+        'evaluation', // 評価
+        'comment',    // コメント
     ];
 
     /**
-     * このレビューが関連付けられている商品を取得
+     * このレビューの対象商品
      */
     public function product(): BelongsTo
     {
-        // reviewsテーブルの product_id と productsテーブルの id を紐づけ
+        // reviews.product_id -> products.id
         return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    /**
+     * このレビューを投稿した会員
+     */
+    public function member(): BelongsTo
+    {
+        // reviews.member_id -> members.id
+        return $this->belongsTo(Member::class, 'member_id', 'id');
     }
 }
