@@ -166,15 +166,47 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // update_confirm (カスタム): POST /admin/category/{category}/confirm -> admin.category.updateConfirm (編集確認)
         });
 
-        // 【新規】商品管理のルート (ProductControllerへ集約)
+        // ----------------------------------------------------
+        // 【新規】商品管理のルート (AdminProductController)
+        // ----------------------------------------------------
         Route::controller(AdminProductController::class)->group(function () {
-            // index: GET /admin/product -> admin.product.index (一覧・検索・並べ替え)
-            Route::get('product', 'index')->name('product.index'); 
 
-            // 以下、登録、詳細、編集のルートも必要に応じて追加します
-            // Route::get('product/create', 'create')->name('product.create');
-            // Route::get('product/{product}', 'show')->name('product.show');
-            // Route::get('product/{product}/edit', 'edit')->name('product.edit');
+            // =======================================================
+            // 1. 【カスタムルート（最優先）】
+            // =======================================================
+            
+            // ★★★ 修正箇所：createをリソースの外、かつIDを持つルートより上に明示的に定義 ★★★
+            // 1-A. 【新規登録フォーム】
+            Route::get('product/create', 'create')->name('product.create');
+            
+            // 1-B. 【新規登録 確認画面】(POST /admin/product/confirm)
+            Route::post('product/confirm', 'confirm')->name('product.confirm');
+
+            // 1-C. 【AJAX & 画像一時アップロード】(IDを持たないカスタムルート)
+            Route::get('product/subcategories', 'getSubcategories')->name('product.ajax_subcategories');
+            Route::post('product/upload-image', 'ajaxUploadImage')->name('product.ajax_upload_image');
+
+            // 1-D. 【編集 確認画面】(IDを持つカスタムルート)
+            // GET: 「戻る」ボタンからの再表示用
+            Route::get('product/{product}/confirm', 'showUpdateConfirm')->name('product.updateConfirm.get');
+            // PUT/PATCH: 編集フォームからの送信用
+            Route::match(['put', 'patch'], 'product/{product}/confirm', 'updateConfirm')->name('product.updateConfirm');
+
+            // =======================================================
+            // 2. 【リソースルート】(createをexceptで除外)
+            // =======================================================
+            
+            // createをカスタムルートで定義したため、リソース定義から除外します。
+            Route::resource('product', AdminProductController::class)->except([
+                'create' // ★★★ 修正箇所：createを除外
+            ]);
+            
+            /*
+            これで以下のルートが生成され、admin.product.create が IDを持つルートに上書きされる可能性がなくなります:
+            1. admin.product.create:   GET  /admin/product/create
+            2. admin.product.show:     GET  /admin/product/{product}
+            3. admin.product.edit:     GET  /admin/product/{product}/edit
+            */
         });
     });
 });

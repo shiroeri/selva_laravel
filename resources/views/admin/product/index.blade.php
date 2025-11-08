@@ -42,11 +42,11 @@
         </div>
 
         <!-- 商品登録ボタン (仮のルート: admin.product.create) -->
-        <!-- <div class="mb-4">
-            <a href="#" class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+        <div class="mb-4">
+            <a href="{{ route('admin.product.create') }}" class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
                 商品登録
             </a>
-        </div> -->
+        </div>
         
         <!-- 検索フォーム -->
         <div class="bg-white shadow-xl rounded-xl p-6 mb-8">
@@ -158,7 +158,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{-- 編集画面へのリンク (仮のルート: admin.product.edit) --}}
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
+                                    <a href="{{ route('admin.product.edit', $product->id) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-150">
                                         編集
                                     </a>
                                 </td>
