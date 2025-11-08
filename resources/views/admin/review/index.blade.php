@@ -25,6 +25,15 @@
         </a>
     </div>
 
+    <!-- 商品レビュー登録ボタン -->
+    <div class="p-6 pb-0">
+        <a href="{{ route('admin.review.create') }}" class="inline-block px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-150">
+            商品レビュー登録
+        </a>
+    </div>
+
+    <br>
+
     {{-- 検索フォーム（縦並び） --}}
     <div class="bg-white shadow-xl rounded-xl p-6 mb-8">
         <form action="{{ route('admin.review.index') }}" method="GET" class="space-y-6">
@@ -118,7 +127,7 @@
                         <td class="px-6 py-4 text-sm text-gray-700 break-all">{{ $rev->comment }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ optional($rev->created_at)->format('Y/m/d') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">編集</a>
+                            <a href="{{ route('admin.review.edit', $rev->id) }}" class="text-indigo-600 hover:text-indigo-900">編集</a>
                         </td>
                     </tr>
                 @empty
