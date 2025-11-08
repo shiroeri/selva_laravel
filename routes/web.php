@@ -208,6 +208,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             3. admin.product.edit:     GET  /admin/product/{product}/edit
             */
         });
+
+        Route::get('review', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('review.index');
+
     });
 });
 

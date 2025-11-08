@@ -72,6 +72,15 @@
                     商品一覧
                 </a>
             </div>
+
+            <br>
+
+            <div class="max-w-md mx-auto px-4">
+                <a href="{{ route('admin.review.index') }}"
+                   class="block w-full text-center px-6 py-4 bg-blue-600 text-white text-xl font-bold rounded-xl shadow-xl hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] border-b-4 border-blue-800 hover:border-blue-900">
+                    商品レビュー一覧
+                </a>
+            </div>
             
         </main>
 
