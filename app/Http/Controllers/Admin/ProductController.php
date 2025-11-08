@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Member;
 use App\Models\ProductCategory;
 use App\Models\ProductSubcategory;
+use App\Models\ProductReview;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -263,19 +264,68 @@ class ProductController extends Controller
 
     /**
      * 商品詳細を表示する
+     * GET /admin/product/{product}
      */
-    public function show(Product $product): View
+    public function show(Product $product, Request $request): View
     {
-        $member     = Member::find($product->member_id);
-        $category   = ProductCategory::find($product->product_category_id);
-        $subcategory= ProductSubcategory::find($product->product_subcategory_id);
+        // 関連マスタ取得
+        $member      = Member::find($product->member_id);
+        $category    = ProductCategory::find($product->product_category_id);
+        $subcategory = ProductSubcategory::find($product->product_subcategory_id);
+
+        // 画像URL（storage/products/... を想定）
+        $imageFields = ['image_1','image_2','image_3','image_4'];
+        $imageUrls   = [];
+        foreach ($imageFields as $f) {
+            $p = $product->$f;
+            $imageUrls[$f] = $p ? asset('storage/' . ltrim($p, '/')) : null;
+        }
+
+        // 商品レビュー（1ページ3件、最新順）
+        $reviews = ProductReview::with(['member:id,name_sei,name_mei'])
+            ->where('product_id', $product->id)
+            ->orderByDesc('id')
+            ->paginate(3)
+            ->withQueryString();
+
+        // ★ 総合評価（全件の evaluation の平均を切り上げ）
+        $ratingAvgRaw   = ProductReview::where('product_id', $product->id)->avg('evaluation'); // 小数（null可）
+        $ratingCount    = ProductReview::where('product_id', $product->id)->whereNotNull('evaluation')->count();
+        $ratingAvgCeil  = $ratingCount ? (int)ceil($ratingAvgRaw) : 0;
 
         return view('admin.product.show', [
             'product'     => $product,
             'member'      => $member,
             'category'    => $category,
             'subcategory' => $subcategory,
+            'imageUrls'   => $imageUrls,
+            'reviews'     => $reviews,
+            'ratingAvgCeil' => $ratingAvgCeil,
+            'ratingCount'   => $ratingCount,
+
         ]);
+    }
+
+    /**
+     * 商品のソフトデリート（関連レビューもソフトデリート）
+     * DELETE /admin/product/{product}
+     */
+    public function destroy(Product $product, Request $request): RedirectResponse
+    {
+        try {
+            // 関連レビューもソフトデリート
+            ProductReview::where('product_id', $product->id)->delete();
+
+            // 商品ソフトデリート
+            $product->delete();
+
+            return redirect()
+                ->route('admin.product.index')
+                ->with('success', '商品を削除しました。');
+        } catch (\Throwable $e) {
+            Log::error('商品削除エラー: ' . $e->getMessage());
+            return back()->with('error', '削除に失敗しました。時間をおいて再度お試しください。');
+        }
     }
 
     /**
