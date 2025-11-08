@@ -263,4 +263,42 @@ class ReviewController extends Controller
 
         return $validator->validated();
     }
+
+    // 商品レビュー詳細
+    public function show(\App\Models\ProductReview $review): \Illuminate\View\View
+    {
+        // 関連
+        $product = $review->product;           // ProductReview::product()
+        $member  = $review->member;            // ProductReview::member()
+
+        // 商品画像（1枚目を表示）
+        $imageUrl = null;
+        if ($product && $product->image_1) {
+            $imageUrl = asset('storage/' . ltrim($product->image_1, '/'));
+        }
+
+        // 総合評価（その商品のレビュー平均を切り上げ）
+        $ratingAvg = \App\Models\ProductReview::where('product_id', $product?->id)->avg('evaluation');
+        $ratingAvgCeil = $ratingAvg ? (int)ceil($ratingAvg) : 0;
+        $ratingCount   = \App\Models\ProductReview::where('product_id', $product?->id)->count();
+
+        return view('admin.review.show', [
+            'review'         => $review,
+            'product'        => $product,
+            'member'         => $member,
+            'imageUrl'       => $imageUrl,
+            'ratingAvgCeil'  => $ratingAvgCeil,
+            'ratingCount'    => $ratingCount,
+        ]);
+    }
+
+    // 商品レビュー削除（ソフトデリート）
+    public function destroy(\App\Models\ProductReview $review): \Illuminate\Http\RedirectResponse
+    {
+        $review->delete(); // SoftDeletes
+        return redirect()
+            ->route('admin.review.index')
+            ->with('success', '商品レビューを削除しました。');
+    }
+
 }

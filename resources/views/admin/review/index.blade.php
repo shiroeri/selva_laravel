@@ -110,6 +110,7 @@
 
                     {{-- 編集リンク（表示のみ） --}}
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider header-static">編集</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider header-static">詳細</th>
                 </tr>
                 </thead>
 
@@ -124,10 +125,13 @@
                                 <span class="ml-2 text-gray-700">{{ $rev->evaluation ?? '-' }}</span>
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-700 break-all">{{ $rev->comment }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700 break-all"><a href="{{ route('admin.review.show', $rev->id) }}" class="text-indigo-600 hover:text-indigo-900">{{ $rev->comment }}</a></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ optional($rev->created_at)->format('Y/m/d') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <a href="{{ route('admin.review.edit', $rev->id) }}" class="text-indigo-600 hover:text-indigo-900">編集</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="{{ route('admin.review.show', $rev->id) }}" class="text-indigo-600 hover:text-indigo-900">詳細</a>
                         </td>
                     </tr>
                 @empty

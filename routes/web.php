@@ -233,6 +233,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // 更新完了
             Route::match(['put','patch'], 'review/{review}', 'update')
                 ->whereNumber('review')->name('review.update');
+            
+            // ★ 追加: 詳細・削除
+            Route::get('review/{review}', 'show')->name('review.show');
+            Route::delete('review/{review}', 'destroy')->name('review.destroy');
         });
 
     });
